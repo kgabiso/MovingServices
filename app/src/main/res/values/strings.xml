@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">MovingServices</string>
+    <string name="prompt_spinner" translatable="false">select vehicle type</string>
+
+    <string-array name="vehicle_type">
+        <item>select vehicle type</item>
+        <item>Compact Vans – (500–600kg)</item>
+        <item>Small Vans – (600–900kg)</item>
+        <item>Medium Panel Vans (900–1200kg)</item>
+        <item>Luton Van - (1000–1200kg)</item>
+        <item>Dropside 3.5t Trucks - (Approx. 1500kg)</item>
+        <item>Pick–up – (1,000–1,100kg)</item>
+    </string-array>
+</resources>
