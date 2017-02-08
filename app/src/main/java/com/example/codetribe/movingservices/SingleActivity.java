@@ -43,7 +43,7 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
 
     private TextView username, title, description, phoneNumber, email, location, likes, dislikes, price;
     private ImageView profilePic, main_image, img_dial;
-    private ImageButton img_like, img_dislike;
+    private ImageButton img_like, img_dislike,img_request;
     private FloatingActionButton delete_btn, fb_dial;
     private CircleImageView pro_pic;
     private DatabaseReference mDataRef;
@@ -112,6 +112,7 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
         img_dislike = (ImageButton) findViewById(R.id.single_img_dislikes);
         img_like = (ImageButton) findViewById(R.id.single_img_likes);
         img_dial = (ImageView) findViewById(R.id.single_dial);
+        img_request = (ImageButton) findViewById(R.id.single_send_request);
         location_finder =(LinearLayout)findViewById(R.id.location_finder);
 
         set_likes(single_Post_key);
@@ -126,6 +127,15 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
                 i.putExtra("location", single_post_location);
                 i.putExtra("title", single_post_title);
                 i.putExtra("price",sing_post_price);
+                startActivity(i);
+            }
+        });
+        img_request.setColorFilter(getResources().getColor(R.color.colorAccent));
+        img_request.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(),Send_RequestActivity.class);
+                i.putExtra("Post_key",single_Post_key);
                 startActivity(i);
             }
         });

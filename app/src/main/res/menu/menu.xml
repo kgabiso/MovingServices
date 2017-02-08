@@ -9,6 +9,9 @@
     android:title="Add Post"
     app:showAsAction="ifRoom"
      />
+    <item android:id="@+id/action_profile"
+        android:title="Profile" />
+
     <item android:id="@+id/action_logout"
         android:title="Log out" />
     <item android:id="@+id/action_settings"

@@ -19,17 +19,6 @@
             android:orientation="vertical">
 
             <EditText
-                android:id="@+id/reg_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:background="@drawable/textview_background"
-                android:ems="10"
-                android:hint="User Name"
-                android:inputType="textPersonName"
-                android:padding="10dp" />
-
-            <EditText
                 android:id="@+id/reg_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -48,6 +37,16 @@
                 android:background="@drawable/textview_background"
                 android:hint="Password"
                 android:inputType="textPassword"
+                android:padding="10dp" />
+            <EditText
+                android:id="@+id/reg_cpassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/textview_background"
+                android:ems="10"
+                android:hint="Confirmation Passowrd"
+                android:inputType="textPersonName"
                 android:padding="10dp" />
 
         </LinearLayout>

@@ -36,6 +36,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.yarolegovich.lovelydialog.LovelyStandardDialog;
 
 import dmax.dialog.SpotsDialog;
 
@@ -51,8 +52,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private GoogleApiClient mGoogleApiClient;
     private static final String TAG = "LoginActivity";
     private FirebaseAuth.AuthStateListener mAuthListner;
+    private LovelyStandardDialog lovelyStandardDialog;
 
-    private TextView signUp;
+    private TextView signUp , forgot_password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,12 +65,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         mDatabaseUser = FirebaseDatabase.getInstance().getReference().child("users");
         mDatabaseUser.keepSynced(true);
 
+        lovelyStandardDialog = new LovelyStandardDialog(this);
         googleButton = (SignInButton) findViewById(R.id.btn_sign_in);
         btn_log = (Button) findViewById(R.id.btn_login);
         log_email = (EditText) findViewById(R.id.log_email);
         log_password = (EditText) findViewById(R.id.log_password);
         signUp = (TextView) findViewById(R.id.log_sign_up);
-
+        forgot_password =(TextView)findViewById(R.id.log_forgot_password);
         mAuthListner = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -83,7 +86,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 // ...
             }
         };
-
+        forgot_password.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent passw_Intent = new Intent(LoginActivity.this, reset_passwordActivity.class);
+                startActivity(passw_Intent);
+            }
+        });
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,7 +151,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         dialog.dismiss();
                     } else {
                         dialog.dismiss();
-                        Toast.makeText(getApplicationContext(), "Error with login ", Toast.LENGTH_SHORT).show();
+                        lovelyStandardDialog
+                                .setTopColorRes(R.color.colorAccent)
+                                .setButtonsColorRes(R.color.colorPrimaryDark)
+                                .setIcon(R.drawable.delivery_truck_icon)
+                                .setTitle("Login Unsuccessful")
+                                .setMessage(task.getException().getMessage())
+                                .setNeutralButton(android.R.string.ok, null)
+                                .show();
                     }
                 }
             });
@@ -259,7 +275,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
 
     }
-
     @Override
     public void onStop() {
         super.onStop();
@@ -281,7 +296,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
-
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {

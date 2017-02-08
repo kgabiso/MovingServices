@@ -40,19 +40,38 @@
         android:layout_marginRight="54dp"
         android:layout_marginEnd="54dp" />
 </RelativeLayout>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginTop="10dp">
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:hint="Display name"
-                android:layout_margin="10dp"
-                android:padding="10dp"
-                android:background="@drawable/textview_background"
-                android:ems="10"
-                android:id="@+id/profile_name"
-                android:layout_gravity="center_horizontal" />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="First name"
+        android:layout_marginRight="5dp"
+        android:padding="10dp"
+        android:background="@drawable/textview_background"
+        android:ems="10"
+        android:id="@+id/profile_name"
+        android:layout_weight="1"
+        android:layout_gravity="center_horizontal" />
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="Last name"
+
+        android:padding="10dp"
+        android:background="@drawable/textview_background"
+        android:ems="10"
+        android:layout_weight="1"
+        android:id="@+id/last_name"
+        android:layout_gravity="center_horizontal" />
+</LinearLayout>
 
 
         </LinearLayout>

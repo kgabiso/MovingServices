@@ -62,6 +62,17 @@
                 android:textStyle="bold"
                 android:layout_margin="10dp"
                 android:padding="10dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="You forgot your password ?"
+                android:clickable="true"
+                android:id="@+id/log_forgot_password"
+                android:textColor="@color/colorAccent"
+                android:layout_gravity="center"
+                android:textStyle="bold"
+               />
+
 
         </LinearLayout>
     </ScrollView>

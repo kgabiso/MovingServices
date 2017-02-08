@@ -164,7 +164,7 @@
                     android:textStyle="normal" />
 <View
     android:layout_width="match_parent"
-    android:layout_height="1dp"
+    android:layout_height="0.5dp"
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
     android:layout_marginBottom="5dp"
@@ -213,10 +213,11 @@
                         android:padding="5dp"
                         android:fontFamily="sans-serif-condensed"
                         android:text="Dislikes" />
+
                 </LinearLayout>
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="0.5dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="5dp"
@@ -233,6 +234,23 @@
                     android:textColor="@color/iconColor"
                     android:textSize="15sp"
                     android:textStyle="normal" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/editText"/>
+                <ImageButton
+                    android:id="@+id/single_send_request"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:background="@null"
+                    android:paddingLeft="5dp"
+                    android:src="@drawable/request" />
             </LinearLayout>
 
 

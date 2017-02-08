@@ -96,6 +96,7 @@ public class SetUpActivity extends AppCompatActivity {
                     String downloadUri = taskSnapshot.getDownloadUrl().toString();
                     mDatabaseRef.child(userID).child("name").setValue(name);
                     mDatabaseRef.child(userID).child("profileimage").setValue(downloadUri);
+
                     Intent mainIntent = new Intent(SetUpActivity.this,MainActivity.class);
                     mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(mainIntent);

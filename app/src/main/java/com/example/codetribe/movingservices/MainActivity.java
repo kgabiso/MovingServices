@@ -32,6 +32,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -74,7 +75,34 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
         mDatabaseDislikes.keepSynced(true);
         no_data_found = (ImageView)findViewById(R.id.No_imageView);
         //checkConnection();
+        mDatabaseRef.child("location").orderByKey().endAt("pretoria").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
+                System.out.println(dataSnapshot.getKey());
+            }
 
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+            // ...
+        });
 mDatabaseRef.addValueEventListener(new ValueEventListener() {
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -178,6 +206,10 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
         }
         if (item.getItemId() == R.id.action_logout) {
             logout();
+        }if(item.getItemId() == R.id.action_profile)
+        {
+            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
 }
@@ -223,7 +255,7 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
         FirebaseRecyclerAdapter<MovingServices, MovingService_ViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<MovingServices, MovingService_ViewHolder>(
                 MovingServices.class,
                 R.layout.rows,
-                MovingService_ViewHolder.class, mDatabaseRef
+                MovingService_ViewHolder.class,mDatabaseRef
         ) {
             @Override
             protected void populateViewHolder(final MovingService_ViewHolder viewHolder, final MovingServices model, int position) {
@@ -334,6 +366,7 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
         staggeredGridLayoutManager.setReverseLayout(false);
         mRecycleList.setLayoutManager(staggeredGridLayoutManager);
       // staggeredGridLayoutManager.scrollToPosition(0);
+
         mRecycleList.setAdapter(firebaseRecyclerAdapter);
 
     }
@@ -378,7 +411,7 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
 
         View nView;
         TextView post_Contact, post_email, post_likes, post_dislike,post_date;
-        ImageButton img_likes, img_dislike;
+        ImageButton img_likes, img_dislike,img_send;
         ImageView post_Image;
         DatabaseReference mDatabaselikes;
         DatabaseReference mDatabaseDislikes;
@@ -396,6 +429,7 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
             mDatabaselikes.keepSynced(true);
             mDatabaseDislikes.keepSynced(true);
 
+            img_send =(ImageButton)nView.findViewById(R.id.img_send);
             post_Image = (ImageView) nView.findViewById(R.id.img_Post);
             post_Contact = (TextView) nView.findViewById(R.id.txtContactNumber);
             post_email = (TextView) nView.findViewById(R.id.txtContactEmail);

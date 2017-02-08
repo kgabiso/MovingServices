@@ -151,17 +151,26 @@
                 android:id="@+id/txtDislikes"
                 android:layout_gravity="center"
                 />
+
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Date"
                 android:id="@+id/txtDate"
-                android:layout_gravity="right"
-                android:gravity="bottom|right"
-android:textSize="5dp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-condensed"
-                android:padding="5dp" />
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="right"
+            android:fontFamily="sans-serif-condensed"
+            android:gravity="bottom|right"
+            android:padding="5dp"
+            android:text="Date"
+            android:textSize="5dp"
+            android:textStyle="bold" />
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/img_send"
+                android:background="@null"
+                android:paddingLeft="5dp"
+                android:src="@drawable/ic_send_black_24dp"
+                android:layout_gravity="center"/>
         </LinearLayout>
     </LinearLayout>
 

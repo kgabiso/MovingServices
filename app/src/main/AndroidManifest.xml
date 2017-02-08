@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".Application_MovingService"
@@ -59,7 +60,13 @@
             android:label="Profile info"
             android:parentActivityName=".MainActivity"
             android:theme="@style/NoToolBar" />
-        <activity android:name=".MapActivity"></activity>
+        <activity android:name=".MapActivity" />
+        <activity android:name=".MessageActivity" />
+        <activity android:name=".Send_RequestActivity" />
+        <activity
+            android:name=".reset_passwordActivity"
+            android:parentActivityName=".LoginActivity" />
+        <activity android:name=".ProfileActivity"></activity>
     </application>
 
 </manifest>
