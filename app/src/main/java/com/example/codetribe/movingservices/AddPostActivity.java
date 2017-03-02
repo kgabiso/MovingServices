@@ -58,12 +58,12 @@ import java.util.Calendar;
 import dmax.dialog.SpotsDialog;
 
 
-public class AddPostActivity extends AppCompatActivity implements OnItemSelectedListener,GoogleApiClient.OnConnectionFailedListener {
+public class AddPostActivity extends AppCompatActivity implements OnItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
 
     private FloatingActionButton fb_chooseimg;
     private ImageButton img_choose;
-    private ImageView img_contacPicker,img_locationPicker;
-    private EditText ed_title, ed_Desc, ed_ContactNumber, ed_Email,ed_price;
+    private ImageView img_contacPicker, img_locationPicker;
+    private EditText ed_title, ed_Desc, ed_ContactNumber, ed_Email, ed_price;
     TextView example;
     private TextView ed_location;
     private Spinner vehicle_type;
@@ -79,13 +79,16 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
     private FirebaseUser currentUser;
     private String mVehicle_type;
     private SpotsDialog dialog;
-    /**************** location******************/
+    /****************
+     * location
+     ******************/
     int PLACE_PICKER_REQUEST = 2;
     private GoogleApiClient mGoogleApiClient;
     LatLng latLng1 = null;
     LatLng latLng2 = null;
     private GoogleMap mMap;
     String TAG = "PlaceAutocompleteFragment";
+
     @TargetApi(Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {//On Create
@@ -104,11 +107,11 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
                 .enableAutoManage(this, this)
                 .build();
 
-        example = (TextView)findViewById(R.id.textexample);
-        vehicle_type = (Spinner)findViewById(R.id.spinner_vehicle);
-        ed_price = (EditText)findViewById(R.id.textPricing);
-        img_contacPicker = (ImageView)findViewById(R.id.contactPicker);
-        img_locationPicker =(ImageView)findViewById(R.id.img_location_picker);
+        example = (TextView) findViewById(R.id.textexample);
+        vehicle_type = (Spinner) findViewById(R.id.spinner_vehicle);
+        ed_price = (EditText) findViewById(R.id.textPricing);
+        img_contacPicker = (ImageView) findViewById(R.id.contactPicker);
+        img_locationPicker = (ImageView) findViewById(R.id.img_location_picker);
         bt_Post = (Button) findViewById(R.id.btn_Post);
         fb_chooseimg = (FloatingActionButton) findViewById(R.id.fb_picture);
         img_choose = (ImageButton) findViewById(R.id.imgPost);
@@ -154,7 +157,7 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
             @Override
             public void onClick(View view) {
                 /*=========== location picker for location icon =================*/
-                Toast.makeText(getApplication(),"loading Google maps ...",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplication(), "loading Google maps ...", Toast.LENGTH_SHORT).show();
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
 
                 try {
@@ -172,7 +175,7 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
             @Override
             public void onClick(View view) {
                  /*=========== location picker for location TextView=================*/
-                Toast.makeText(getApplication(),"loading Google maps ...",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplication(), "loading Google maps ...", Toast.LENGTH_SHORT).show();
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
 
                 try {
@@ -194,7 +197,7 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
     }
 
     private void startingPost() {
-       // progressBar.setVisibility(View.VISIBLE);
+        // progressBar.setVisibility(View.VISIBLE);
         dialog.show();
         final String mTitle = ed_title.getText().toString();
         final String mDesc = ed_Desc.getText().toString();
@@ -202,12 +205,11 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
         final String mEmail = ed_Email.getText().toString();
         final String mLoction = ed_location.getText().toString();
         final String mPrice = ed_price.getText().toString();
-        final String mDate =DateFormat.getDateInstance(DateFormat.SHORT).format(Calendar.getInstance().getTime());
-        Toast.makeText(getApplicationContext(),mDate,Toast.LENGTH_SHORT).show();
-        if(vehicle_type.getSelectedItemPosition() != 0) {
+        final String mDate = DateFormat.getDateInstance(DateFormat.SHORT).format(Calendar.getInstance().getTime());
+        Toast.makeText(getApplicationContext(), mDate, Toast.LENGTH_SHORT).show();
+        if (vehicle_type.getSelectedItemPosition() != 0) {
             mVehicle_type = vehicle_type.getSelectedItem().toString();
-        }
-        else {
+        } else {
             mVehicle_type = "";
         }
         vehicle_type.setOnClickListener(new View.OnClickListener() {
@@ -216,7 +218,7 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
                 example.setText(message);
             }
         });
-        if (!TextUtils.isEmpty(mTitle) && !TextUtils.isEmpty(mDesc) && !TextUtils.isEmpty(mContactNumber) && !TextUtils.isEmpty(mEmail) && !TextUtils.isEmpty(mLoction) && !TextUtils.isEmpty(mPrice) && imgUri!=null ) {
+        if (!TextUtils.isEmpty(mTitle) && !TextUtils.isEmpty(mDesc) && !TextUtils.isEmpty(mContactNumber) && !TextUtils.isEmpty(mEmail) && !TextUtils.isEmpty(mLoction) && !TextUtils.isEmpty(mPrice) && imgUri != null) {
 
             final StorageReference filepath = mStorageRef.child("Truck_images").child(imgUri.getLastPathSegment()/*name of image*/);
             filepath.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -224,12 +226,12 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     final Uri downloadUri = taskSnapshot.getDownloadUrl();// get img URI
 
-                    final DatabaseReference newPost =  mDatabaseRef.push();
+                    final DatabaseReference newPost = mDatabaseRef.push();
 
                     mDatabaseUser.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                           // progressBar.setVisibility(View.VISIBLE);
+                            // progressBar.setVisibility(View.VISIBLE);
                             newPost.child("title").setValue(mTitle);
                             newPost.child("description").setValue(mDesc);
                             newPost.child("contactNumber").setValue(mContactNumber);
@@ -245,39 +247,29 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
                             newPost.child("username").setValue(dataSnapshot.child("name").getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    if(task.isSuccessful()){
+                                    if (task.isSuccessful()) {
                                         dialog.dismiss();
-                                        Intent intent = new Intent(AddPostActivity.this,MainActivity.class);
+                                        Intent intent = new Intent(AddPostActivity.this, MainActivity.class);
                                         startActivity(intent);
                                         finish();
-                                    }
-                                    else {
-                                        Toast.makeText(getApplicationContext(),"Error Posting",Toast.LENGTH_SHORT).show();
-                                                dialog.dismiss();
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "Error Posting", Toast.LENGTH_SHORT).show();
+                                        dialog.dismiss();
                                     }
                                 }
                             });
-
                         }
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
                         }
                     });
-
-
-
-
                 }
             });
-        }
-        else {
+        } else {
 
             dialog.dismiss();
         }
-
-
     }
 
     @Override
@@ -290,14 +282,14 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
             Glide.with(getApplicationContext()).load(imgUri).centerCrop().error(R.drawable.image_not_available).into(img_choose);
             CropImage.activity(imgUri)
                     .setGuidelines(CropImageView.Guidelines.ON)
-                    .setAspectRatio(16,9)
+                    .setAspectRatio(16, 9)
                     .start(this);
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 Uri resultUri = result.getUri();
-               Glide.with(getApplicationContext()).load(resultUri).centerCrop().error(R.drawable.image_not_available).into(img_choose);
+                Glide.with(getApplicationContext()).load(resultUri).centerCrop().error(R.drawable.image_not_available).into(img_choose);
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
             }
@@ -313,7 +305,7 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
             }
         }
         if (requestCode == PLACE_PICKER_REQUEST) {
-          if (resultCode == RESULT_OK) {
+            if (resultCode == RESULT_OK) {
                 place = PlacePicker.getPlace(data, this);
                 String toastMsg = String.format("%s", place.getAddress());
                 latLng1 = place.getLatLng();
@@ -328,6 +320,7 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
         }
 
     }
+
     private void contactPicked(Intent data) {
         Cursor cursorContact = null;
         try {
@@ -349,27 +342,27 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
 
-        switch (i){
-            case  0:
+        switch (i) {
+            case 0:
                 message = "please select a vehicle";
                 break;
-            case  1:
-                message ="- eg.Citroen Nemo, Peugeot Bipper and Similar (500-600kg)";
+            case 1:
+                message = "- eg.Citroen Nemo, Peugeot Bipper and Similar (500-600kg)";
                 break;
-            case  2:
-                message ="- eg.Ford Transit Connect, Vauxhall Combo and Similar (600-900kg)";
+            case 2:
+                message = "- eg.Ford Transit Connect, Vauxhall Combo and Similar (600-900kg)";
                 break;
-            case  3:
-                message ="-eg.Ford Transit SWB, Volkswagen Transporter SWB or Renault Trafic (900-1200kg)";
+            case 3:
+                message = "-eg.Ford Transit SWB, Volkswagen Transporter SWB or Renault Trafic (900-1200kg)";
                 break;
-            case  4:
-                message =" -eg.FORD TRANSIT LUTON TAIL,Mercedes Luton van,MERCEDES SPRINTER LUTON VAN (1000–1200kg)";
+            case 4:
+                message = " -eg.FORD TRANSIT LUTON TAIL,Mercedes Luton van,MERCEDES SPRINTER LUTON VAN (1000–1200kg)";
                 break;
-            case  5:
-                message ="-eg.Isuzu FTR800 Dropside,TATA 709 DROPSIDE TRUCK,MITSUBISHI FUSO DROPSIDES (Approx. 1500kg)";
+            case 5:
+                message = "-eg.Isuzu FTR800 Dropside,TATA 709 DROPSIDE TRUCK,MITSUBISHI FUSO DROPSIDES (Approx. 1500kg)";
                 break;
-            case  6:
-                message ="-eg.Ford Ranger, Mitsubishi L200, Isuzu D–Max and Similar (1,000–1,100kg)";
+            case 6:
+                message = "-eg.Ford Ranger, Mitsubishi L200, Isuzu D–Max and Similar (1,000–1,100kg)";
                 break;
         }
 

@@ -57,6 +57,7 @@ public class reset_passwordActivity extends AppCompatActivity {
                                             public void onClick(View view) {
                                                 Intent passw_Intent = new Intent(reset_passwordActivity.this, LoginActivity.class);
                                                 startActivity(passw_Intent);
+                                                finish();
                                             }
                                         })
                                         .show();

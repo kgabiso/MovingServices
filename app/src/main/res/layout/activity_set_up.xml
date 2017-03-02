@@ -26,7 +26,7 @@
         android:id="@+id/profile_image"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:src="@drawable/default_pic"
+        android:src="@drawable/ic_account_circle_black_24dp"
         android:scaleType="centerCrop"
         app:civ_border_width="1dp"
         app:civ_border_color="@android:color/white"/>
@@ -64,7 +64,6 @@
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
         android:hint="Last name"
-
         android:padding="10dp"
         android:background="@drawable/textview_background"
         android:ems="10"

@@ -16,6 +16,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -41,10 +45,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SingleActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-    private TextView username, title, description, phoneNumber, email, location, likes, dislikes, price;
+    private TextView username, title, description, phoneNumber, email, location, likes, dislikes, price,img_request;
     private ImageView profilePic, main_image, img_dial;
-    private ImageButton img_like, img_dislike,img_request;
-    private FloatingActionButton delete_btn, fb_dial;
+    private ImageButton img_like, img_dislike;
+    private FloatingActionButton delete_btn, fb_dial,fb,fb_send;
     private CircleImageView pro_pic;
     private DatabaseReference mDataRef;
     private DatabaseReference mDataLike;
@@ -60,11 +64,13 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
     double single_post_long;
     String single_post_title, single_post_location;
     String sing_post_price;
+    String single_post_uID;
     double lat, lng;
     LovelyStandardDialog lovelyStandardDialog;
     CollapsingToolbarLayout collapsingToolbarLayout;
-
-
+    private boolean mClick = true ;
+    private Animation fab_open,fab_close,rotate_forward,rotate_backward;
+    private RotateAnimation rotate_clock,rotate_antiClock;
     public SingleActivity() {
     }
 
@@ -81,7 +87,11 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
 
 
         mAuth = FirebaseAuth.getInstance();
-        single_Post_key = getIntent().getExtras().getString("Single_Post_id");
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        if(bundle != null) {
+            single_Post_key = getIntent().getExtras().getString("Single_Post_id");
+        }
         mDataRef = FirebaseDatabase.getInstance().getReference().child("Moving_Services");
         mDataLike = FirebaseDatabase.getInstance().getReference().child("likes");
         mDataDislike = FirebaseDatabase.getInstance().getReference().child("Dislikes");
@@ -104,6 +114,8 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
         likes = (TextView) findViewById(R.id.single_Likes);
         dislikes = (TextView) findViewById(R.id.single_Dislikes);
         fb_dial = (FloatingActionButton) findViewById(R.id.single_fb_dial);
+        fb =(FloatingActionButton)findViewById(R.id.single_fb);
+        fb_send =(FloatingActionButton)findViewById(R.id.single_fb_send);
         pro_pic = (CircleImageView) findViewById(R.id.single_profile_image);
         lin_email = (LinearLayout) findViewById(R.id.single_lin_email);
         lin_phone = (LinearLayout) findViewById(R.id.single_lin_phone);
@@ -112,9 +124,15 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
         img_dislike = (ImageButton) findViewById(R.id.single_img_dislikes);
         img_like = (ImageButton) findViewById(R.id.single_img_likes);
         img_dial = (ImageView) findViewById(R.id.single_dial);
-        img_request = (ImageButton) findViewById(R.id.single_send_request);
+        img_request = (TextView) findViewById(R.id.single_send_request);
         location_finder =(LinearLayout)findViewById(R.id.location_finder);
+        //+++++++++++++++++animations===========================
+        fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
 
+        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        fb_send.setVisibility(View.INVISIBLE);
+        fb_dial.setVisibility(View.INVISIBLE);
         set_likes(single_Post_key);
         set_Profile(mAuth.getCurrentUser().getUid().toString());
         location_finder.setClickable(true);
@@ -130,13 +148,11 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
                 startActivity(i);
             }
         });
-        img_request.setColorFilter(getResources().getColor(R.color.colorAccent));
+
         img_request.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(),Send_RequestActivity.class);
-                i.putExtra("Post_key",single_Post_key);
-                startActivity(i);
+
             }
         });
         img_like.setOnClickListener(new View.OnClickListener() {
@@ -222,7 +238,29 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
                 }
             }
         });
-
+        fb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mClick) {
+                    open_Fab();
+                    mClick= false;
+                }else {
+                    close_fab();
+                    mClick = true;
+                }
+            }
+        });
+        fb_send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                close_fab();
+                mClick = true;
+                Intent i = new Intent(getApplicationContext(),Send_RequestActivity.class);
+                i.putExtra("Post_key",single_Post_key);
+                i.putExtra("owerID",single_post_uID);
+                startActivity(i);
+            }
+        });
         fb_dial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -231,6 +269,8 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
                 } else {
                     Toast.makeText(getApplicationContext(), "No number found", Toast.LENGTH_LONG).show();
                 }
+                close_fab();
+                mClick = true;
             }
         });
         delete_btn = (FloatingActionButton) findViewById(R.id.single_delete);
@@ -271,7 +311,7 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
                 single_post_lat = (double) dataSnapshot.child("latlong").child("latitude").getValue();
                 single_post_long = (double) dataSnapshot.child("latlong").child("longitude").getValue();
                 String single_post_image = (String) dataSnapshot.child("image").getValue();
-                String single_post_uID = (String) dataSnapshot.child("uid").getValue();
+                single_post_uID = (String) dataSnapshot.child("uid").getValue();
                 String single_post_propic = (String) dataSnapshot.child("profile").getValue();
                 sing_post_price = (String) dataSnapshot.child("price").getValue();
 
@@ -304,7 +344,34 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
         lat = single_post_lat;
         lng = single_post_long;
     }
+public void open_Fab(){
+    rotate_clock = new RotateAnimation(0, 90, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+    rotate_clock.setFillAfter(true);
+    rotate_clock.setDuration(300);
+    rotate_clock.setInterpolator(new AccelerateDecelerateInterpolator());
 
+    fb_send.setVisibility(View.VISIBLE);
+    fb_dial.setVisibility(View.VISIBLE);
+    fb_send.setClickable(true);
+    fb_dial.setClickable(true);
+    fb.startAnimation(rotate_clock);
+    fb_send.startAnimation(fab_open);
+    fb_dial.startAnimation(fab_open);
+}
+    public void close_fab(){
+        rotate_antiClock = new RotateAnimation(90, 0, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        rotate_antiClock.setFillAfter(true);
+        rotate_antiClock.setDuration(300);
+        rotate_antiClock.setInterpolator(new AccelerateDecelerateInterpolator());
+
+        fb_send.setVisibility(View.INVISIBLE);
+        fb_dial.setVisibility(View.INVISIBLE);
+        fb_send.setClickable(false);
+        fb_dial.setClickable(false);
+        fb.startAnimation(rotate_antiClock);
+        fb_send.startAnimation(fab_close);
+        fb_dial.startAnimation(fab_close);
+    }
     protected void sendEmail(String To) {
         Log.i("Send email", "");
         String[] TO = {To};
@@ -347,12 +414,12 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())) {
-                    img_like.setImageResource(R.drawable.ic_mood_active_24dp1);
+                   // img_like.setImageResource(R.drawable.ic_mood_active_24dp1);
                     likes.setText("Likes " + (int) dataSnapshot.child(post_key).getChildrenCount());
-                    likes.setTextColor(ContextCompat.getColor(SingleActivity.this, R.color.likeButton));
+                    likes.setTextColor(ContextCompat.getColor(SingleActivity.this, R.color.accept));
                     img_dislike.setEnabled(false);
                 } else {
-                    img_like.setImageResource(R.drawable.ic_mood_black_24dp);
+                   // img_like.setImageResource(R.drawable.ic_mood_black_24dp);
                     likes.setText("Likes " + (int) dataSnapshot.child(post_key).getChildrenCount());
                     likes.setTextColor(ContextCompat.getColor(SingleActivity.this, R.color.editText));
                     img_dislike.setEnabled(true);
@@ -368,12 +435,12 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())) {
-                    img_dislike.setImageResource(R.drawable.ic_mood_bad_active_24dp1);
+                    //img_dislike.setImageResource(R.drawable.ic_mood_bad_active_24dp1);
                     dislikes.setText("Dislikes " + (int) dataSnapshot.child(post_key).getChildrenCount());
-                    dislikes.setTextColor(ContextCompat.getColor(SingleActivity.this, R.color.likeButton));
+                    dislikes.setTextColor(ContextCompat.getColor(SingleActivity.this, R.color.reject));
                     img_like.setEnabled(false);
                 } else {
-                    img_dislike.setImageResource(R.drawable.ic_mood_bad_black_24dp);
+                    //img_dislike.setImageResource(R.drawable.ic_mood_bad_black_24dp);
                     dislikes.setText("Dislikes " + (int) dataSnapshot.child(post_key).getChildrenCount());
                     dislikes.setTextColor(ContextCompat.getColor(SingleActivity.this, R.color.editText));
                     img_like.setEnabled(true);

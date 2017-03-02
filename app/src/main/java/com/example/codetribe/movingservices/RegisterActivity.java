@@ -76,7 +76,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     .setTopColorRes(R.color.colorAccent)
                                     .setButtonsColorRes(R.color.colorPrimaryDark)
                                     .setIcon(R.drawable.delivery_truck_icon)
-                                    .setTitle("Reset Password Unsuccessful")
+                                    .setTitle("Sign up Unsuccessful")
                                     .setMessage(task.getException().getMessage())
                                     .setNeutralButton(android.R.string.ok, null)
                                     .show();

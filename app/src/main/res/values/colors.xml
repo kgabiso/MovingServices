@@ -9,5 +9,13 @@
     <color name="secondaryText">#757575</color>
     <color name="likeButton">#F8BBD0</color>
     <color name="lightPrimary">#C8E6C9</color>
-
+    <color name="accept">#3b5998</color>
+    <color name="reject">#FF0000</color>
+    <color name="floataction">#4CAF50</color>
+    <color name="floataction2">#388E3C</color>
+<color name="pending">#FF5722</color>
+    <color name="altern_rout">#03A9F4</color>
+    <color name="altern_rout1">#8BC34A</color>
+    <color name="altern_rout2">#2196F3</color>
+    <color name="route">#E91E63</color>
 </resources>

@@ -1,12 +1,16 @@
 package com.example.codetribe.movingservices;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +21,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,17 +39,20 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+import io.codetail.animation.SupportAnimator;
+import io.codetail.animation.ViewAnimationUtils;
+
 public class MainActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
 
     RecyclerView mRecycleList;
-    FloatingActionButton fb_Add;
+
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mDatabaseLikes;
     private DatabaseReference mDatabaseDislikes;
@@ -53,76 +63,120 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
     private boolean mProcessDislike = false;
     private GoogleApiClient mGoogleApiClient;
     ImageView no_data_found;
+    String token;
     //keeep state of recycler View
-    private final String KEY_RECYCLER_STATE = "recycler_state";
     StaggeredGridLayoutManager staggeredGridLayoutManager;
-    private static Bundle mBundleRecyclerViewState;
+    private Animation fab_open, fab_close, rotate_forward, rotate_backward;
+    private BroadcastReceiver broadcastReceiver;
+    private LinearLayout mRevealView;
+    private boolean hidden = true;
+    private ImageButton add_btn , request_btn, settings_btn, contact_btn;
+    private CircleImageView profile_btn,sign_out_btn;
+    private SupportAnimator animator_reverse;
+    private SupportAnimator animator;
 
+    public MainActivity() {
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Moving_Services");
         mDataUsers = FirebaseDatabase.getInstance().getReference().child("users");
         mDatabaseLikes = FirebaseDatabase.getInstance().getReference().child("likes");
         mDatabaseDislikes = FirebaseDatabase.getInstance().getReference().child("Dislikes");
+        mAuth = FirebaseAuth.getInstance();
         //keep synced
         mDataUsers.keepSynced(true);
         mDatabaseRef.keepSynced(true);
         mDatabaseLikes.keepSynced(true);
         mDatabaseDislikes.keepSynced(true);
-        no_data_found = (ImageView)findViewById(R.id.No_imageView);
+        no_data_found = (ImageView) findViewById(R.id.No_imageView);
+
+        //==================== menu ==========================
+        add_btn = (ImageButton)findViewById(R.id.menu_add);
+        profile_btn =(CircleImageView)findViewById(R.id.menu_profile);
+        request_btn =(ImageButton)findViewById(R.id.menu_request);
+        settings_btn =(ImageButton)findViewById(R.id.menu_settings);
+        contact_btn =(ImageButton)findViewById(R.id.menu_about);
+        sign_out_btn =(CircleImageView)findViewById(R.id.menu_sign_out);
+        mRevealView = (LinearLayout) findViewById(R.id.reveal_items);
+        mRevealView.setVisibility(View.GONE);
+
+        add_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, AddPostActivity.class);
+                startActivity(intent);
+                hideRevealView();
+            }
+        });
+        profile_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                hideRevealView();
+            }
+        });
+        request_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, MessageActivity.class);
+                startActivity(intent);
+                hideRevealView();
+            }
+        });
+        settings_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideRevealView();
+            }
+        });
+        contact_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideRevealView();
+            }
+        });
+        sign_out_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                logout();
+                hideRevealView();
+            }
+        });
+        //==================================
         //checkConnection();
-        mDatabaseRef.child("location").orderByKey().endAt("pretoria").addChildEventListener(new ChildEventListener() {
+
+        //+++++++++++++++++animations===========================
+        fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
+        rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_forward);
+        rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_backward);
+        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        mDatabaseRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
-                System.out.println(dataSnapshot.getKey());
-            }
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() == null) {
+                    no_data_found.setVisibility(View.VISIBLE);
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                } else {
+                    no_data_found.setVisibility(View.GONE);
 
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-
-            // ...
         });
-mDatabaseRef.addValueEventListener(new ValueEventListener() {
-    @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-        if(dataSnapshot.getValue() == null)
-        {
-            no_data_found.setVisibility(View.VISIBLE);
-
-        }
-        else {
-            no_data_found.setVisibility(View.GONE);
-
-        }
-    }
-
-    @Override
-    public void onCancelled(DatabaseError databaseError) {
-
-    }
-});
-        mAuth = FirebaseAuth.getInstance();
 
         mAuthListner = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -146,27 +200,27 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
                     }
                 }).addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
         checkUserExist();
-
+        displayPicture();
         mRecycleList = (RecyclerView) findViewById(R.id.recycleList);
-
         mRecycleList.setHasFixedSize(true);
-        staggeredGridLayoutManager = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
+        staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         staggeredGridLayoutManager.setReverseLayout(false);
-       // staggeredGridLayoutManager.scrollToPosition(0);
         mRecycleList.setLayoutManager(staggeredGridLayoutManager);
-
-
-
-        fb_Add = (FloatingActionButton) findViewById(R.id.fb_button);
-        fb_Add.setOnClickListener(new View.OnClickListener() {
+        mRecycleList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, AddPostActivity.class);
-                startActivity(intent);
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                hideRevealView();
             }
         });
-    }
 
+
+    }
     protected void sendEmail(String To) {
         Log.i("Send email", "");
         String[] TO = {To};
@@ -187,6 +241,23 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
         }
     }
 
+    //fetch user profile
+    public void displayPicture(){
+        if(mAuth.getCurrentUser() != null) {
+            mDataUsers.child(mAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String uri = dataSnapshot.child("profileimage").getValue().toString();
+                    Glide.with(getApplicationContext()).load(uri).centerCrop().error(R.drawable.ic_account_circle_black_24dp).into(profile_btn);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -197,23 +268,100 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
         return true;
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.action_add) {
-            Intent intent = new Intent(MainActivity.this, AddPostActivity.class);
-            startActivity(intent);
-        }
-        if (item.getItemId() == R.id.action_logout) {
-            logout();
-        }if(item.getItemId() == R.id.action_profile)
-        {
-            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-            startActivity(intent);
-        }
-        return super.onOptionsItemSelected(item);
-}
+//            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+//            startActivity(intent);
+//            close_fab();
+            int cx = (mRevealView.getLeft() + mRevealView.getRight());
+            int cy = mRevealView.getTop();
+            int radius = Math.max(mRevealView.getWidth(), mRevealView.getHeight());
 
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                 animator =
+                        ViewAnimationUtils.createCircularReveal(mRevealView, cx, cy, 0, radius);
+                animator.setInterpolator(new AccelerateDecelerateInterpolator());
+                animator.setDuration(700);
+
+                 animator_reverse = animator.reverse();
+
+                if (hidden) {
+                    mRevealView.setVisibility(View.VISIBLE);
+                    animator.start();
+                    hidden = false;
+                }else {
+                    animator_reverse.addListener(new SupportAnimator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart() {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd() {
+                            mRevealView.setVisibility(View.INVISIBLE);
+                            hidden = true;
+
+                        }
+
+                        @Override
+                        public void onAnimationCancel() {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat() {
+
+                        }
+                    });
+                    animator_reverse.start();
+                } // Android LOLIPOP And ABOVE Version
+
+            } if (hidden) {
+                Animator anim = android.view.ViewAnimationUtils.
+                        createCircularReveal(mRevealView, cx, cy, 0, radius);
+                mRevealView.setVisibility(View.VISIBLE);
+                anim.start();
+                hidden = false;
+            } else {
+                Animator anim = android.view.ViewAnimationUtils.
+                        createCircularReveal(mRevealView, cx, cy, radius, 0);
+                anim.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        mRevealView.setVisibility(View.INVISIBLE);
+                        hidden = true;
+                    }
+                });
+                anim.start();
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void hideRevealView() {
+        // Android LOLIPOP And ABOVE Version
+        int cx = (mRevealView.getLeft() + mRevealView.getRight());
+        int cy = mRevealView.getTop();
+        int radius = Math.max(mRevealView.getWidth(), mRevealView.getHeight());
+        if (mRevealView.getVisibility() == View.VISIBLE) {
+            Animator anim = android.view.ViewAnimationUtils.
+                    createCircularReveal(mRevealView, cx, cy, radius, 0);
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    mRevealView.setVisibility(View.INVISIBLE);
+                    hidden = true;
+                }
+            });
+            anim.start();
+        }
+    }
     private void logout() {
         mAuth.signOut();
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
@@ -229,9 +377,10 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
         finish();
 
     }
+
     public void Dial(String phoneNumber) {
         Intent callIntent = new Intent(Intent.ACTION_CALL);
-        callIntent.setData(Uri.parse("tel:"+phoneNumber.trim()));
+        callIntent.setData(Uri.parse("tel:" + phoneNumber.trim()));
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -255,7 +404,7 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
         FirebaseRecyclerAdapter<MovingServices, MovingService_ViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<MovingServices, MovingService_ViewHolder>(
                 MovingServices.class,
                 R.layout.rows,
-                MovingService_ViewHolder.class,mDatabaseRef
+                MovingService_ViewHolder.class, mDatabaseRef
         ) {
             @Override
             protected void populateViewHolder(final MovingService_ViewHolder viewHolder, final MovingServices model, int position) {
@@ -270,14 +419,14 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
                 viewHolder.setImg_likes(post_key);
                 viewHolder.setDate(model.getDate());
 
-
-
                 viewHolder.post_Image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent singleIntent = new Intent(MainActivity.this, SingleActivity.class);
                         singleIntent.putExtra("Single_Post_id", post_key);
                         startActivity(singleIntent);
+                        hideRevealView();
+
                     }
                 });
 
@@ -362,10 +511,10 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
 
         };
         mRecycleList.setHasFixedSize(true);
-        staggeredGridLayoutManager = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
+        staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         staggeredGridLayoutManager.setReverseLayout(false);
         mRecycleList.setLayoutManager(staggeredGridLayoutManager);
-      // staggeredGridLayoutManager.scrollToPosition(0);
+        // staggeredGridLayoutManager.scrollToPosition(0);
 
         mRecycleList.setAdapter(firebaseRecyclerAdapter);
 
@@ -410,13 +559,14 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
     public static class MovingService_ViewHolder extends RecyclerView.ViewHolder {
 
         View nView;
-        TextView post_Contact, post_email, post_likes, post_dislike,post_date;
-        ImageButton img_likes, img_dislike,img_send;
+        TextView post_Contact, post_email, post_likes, post_dislike, post_date;
+        ImageButton img_send,
+                img_likes, img_dislike;
         ImageView post_Image;
         DatabaseReference mDatabaselikes;
         DatabaseReference mDatabaseDislikes;
         FirebaseAuth mAuth;
-        private LinearLayout lin_email,lin_phone;
+        private LinearLayout lin_email, lin_phone;
 
 
         public MovingService_ViewHolder(View itemView) {
@@ -429,17 +579,17 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
             mDatabaselikes.keepSynced(true);
             mDatabaseDislikes.keepSynced(true);
 
-            img_send =(ImageButton)nView.findViewById(R.id.img_send);
+            img_send = (ImageButton) nView.findViewById(R.id.img_send);
             post_Image = (ImageView) nView.findViewById(R.id.img_Post);
             post_Contact = (TextView) nView.findViewById(R.id.txtContactNumber);
             post_email = (TextView) nView.findViewById(R.id.txtContactEmail);
             post_dislike = (TextView) nView.findViewById(R.id.txtDislikes);
             post_likes = (TextView) nView.findViewById(R.id.txtLikes);
-            post_date =(TextView)nView.findViewById(R.id.txtDate);
+            post_date = (TextView) nView.findViewById(R.id.txtDate);
             img_dislike = (ImageButton) nView.findViewById(R.id.img_dislikes);
             img_likes = (ImageButton) nView.findViewById(R.id.img_likes);
-            lin_email = (LinearLayout)nView.findViewById(R.id.lin_email);
-            lin_phone =(LinearLayout)nView.findViewById(R.id.lin_phone);
+            lin_email = (LinearLayout) nView.findViewById(R.id.lin_email);
+            lin_phone = (LinearLayout) nView.findViewById(R.id.lin_phone);
 
         }
 
@@ -450,12 +600,12 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     try {
                         if (dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())) {
-                            img_likes.setImageResource(R.drawable.ic_mood_active_24dp1);
+                            // img_likes.setImageResource(R.drawable.ic_mood_active_24dp1);
                             post_likes.setText(" " + (int) dataSnapshot.child(post_key).getChildrenCount());
-                            post_likes.setTextColor(ContextCompat.getColor(nView.getContext(), R.color.likeButton));
+                            post_likes.setTextColor(ContextCompat.getColor(nView.getContext(), R.color.accept));
                             img_dislike.setEnabled(false);
                         } else {
-                            img_likes.setImageResource(R.drawable.ic_mood_black_24dp);
+                            // img_likes.setImageResource(R.drawable.ic_mood_black_24dp);
                             post_likes.setText(" " + (int) dataSnapshot.child(post_key).getChildrenCount());
                             post_likes.setTextColor(ContextCompat.getColor(nView.getContext(), R.color.editText));
                             img_dislike.setEnabled(true);
@@ -477,15 +627,15 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     try {
                         if (dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())) {
-                            img_dislike.setImageResource(R.drawable.ic_mood_bad_active_24dp1);
+                            //img_dislike.setImageResource(R.drawable.ic_mood_bad_active_24dp1);
                             post_dislike.setText(" " + (int) dataSnapshot.child(post_key).getChildrenCount());
-                            post_dislike.setTextColor(ContextCompat.getColor(nView.getContext(), R.color.likeButton));
+                            post_dislike.setTextColor(ContextCompat.getColor(nView.getContext(), R.color.reject));
                             img_likes.setEnabled(false);
 
                         } else {
 
-                            img_dislike.setImageResource(R.drawable.ic_mood_bad_black_24dp);
-                            post_dislike.setText(" "+ (int) dataSnapshot.child(post_key).getChildrenCount());
+                            //img_dislike.setImageResource(R.drawable.ic_mood_bad_black_24dp);
+                            post_dislike.setText(" " + (int) dataSnapshot.child(post_key).getChildrenCount());
                             post_dislike.setTextColor(ContextCompat.getColor(nView.getContext(), R.color.editText));
                             img_likes.setEnabled(true);
                         }
@@ -526,7 +676,8 @@ mDatabaseRef.addValueEventListener(new ValueEventListener() {
             TextView post_location = (TextView) nView.findViewById(R.id.txtlocation);
             post_location.setText(loction);
         }
-        public void setDate(String date){
+
+        public void setDate(String date) {
             post_date.setText(date);
         }
 

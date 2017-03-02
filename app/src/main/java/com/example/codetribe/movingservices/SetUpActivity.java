@@ -28,7 +28,7 @@ import dmax.dialog.SpotsDialog;
 public class SetUpActivity extends AppCompatActivity {
 
    private CircleImageView profilePic;
-   private EditText nameField;
+   private EditText firstName, lastName;
     private Button btn_submit;
     private static final int Galleery_REQUEST = 1;
     private FloatingActionButton profilebutton;
@@ -50,7 +50,8 @@ public class SetUpActivity extends AppCompatActivity {
         dialog = new SpotsDialog(this);
         profilebutton = (FloatingActionButton)findViewById(R.id.single_fb);
         profilePic = (CircleImageView)findViewById(R.id.profile_image);
-        nameField =(EditText)findViewById(R.id.profile_name);
+        firstName =(EditText)findViewById(R.id.profile_name);
+        lastName=(EditText)findViewById(R.id.last_name);
         btn_submit = (Button)findViewById(R.id.btn_submit);
 
         profilebutton.setOnClickListener(new View.OnClickListener() {
@@ -82,10 +83,11 @@ public class SetUpActivity extends AppCompatActivity {
     }
 
     private void setUpAccount() {
-        final String name = nameField.getText().toString().trim();
+        final String name = firstName.getText().toString().trim();
+        final String lname = lastName.getText().toString().trim();
         final String userID = mAuth.getCurrentUser().getUid();
 
-        if(!TextUtils.isEmpty(name) && imgUri != null){
+        if(!TextUtils.isEmpty(name) && imgUri != null && !TextUtils.isEmpty(lname)){
 
 
             dialog.show();
@@ -95,11 +97,13 @@ public class SetUpActivity extends AppCompatActivity {
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     String downloadUri = taskSnapshot.getDownloadUrl().toString();
                     mDatabaseRef.child(userID).child("name").setValue(name);
+                    mDatabaseRef.child(userID).child("lname").setValue(lastName);
                     mDatabaseRef.child(userID).child("profileimage").setValue(downloadUri);
 
                     Intent mainIntent = new Intent(SetUpActivity.this,MainActivity.class);
                     mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(mainIntent);
+                    finish();
                     dialog.dismiss();
                 }
             });

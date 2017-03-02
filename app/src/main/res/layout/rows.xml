@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-
+    xmlns:app="http://schemas.android.com/tools"
     card_view:cardUseCompatPadding="true"
     android:orientation="vertical">
 
@@ -121,10 +121,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/img_likes"
-                android:background="@null"
+                android:background="@drawable/round_imageview"
+                app:backgroundTint="@color/accept"
                 android:paddingLeft="5dp"
-                android:src="@drawable/ic_mood_black_24dp"
-                android:layout_gravity="center"/>
+                android:src="@drawable/ic_accept"
+                android:layout_gravity="center"
+                app:fabSize="mini"
+                app:elevation="0dp"
+                />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -138,10 +142,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/img_dislikes"
-                android:background="@null"
                 android:paddingLeft="5dp"
-                android:src="@drawable/ic_mood_bad_black_24dp"
-                android:layout_gravity="center"/>
+                android:src="@drawable/ic_reject"
+                android:layout_gravity="center"
+                android:background="@drawable/round_dislike"
+                app:backgroundTint="@color/reject"
+                app:fabSize="mini"
+                app:elevation="0dp"
+                />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
