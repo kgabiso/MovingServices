@@ -256,12 +256,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:drawableLeft="@drawable/ic_send_black_24dp"
+                    android:drawablePadding="5dp"
                     android:gravity="center_vertical"
-                    android:text="status"
-                    android:textColor="@color/pending"
                     android:paddingLeft="5dp"
-                    android:drawableLeft="@drawable/ic_done_black_24dp"
-                    android:drawablePadding="5dp"/>
+                    android:text="status"
+                    android:textColor="@color/cast_expanded_controller_background_color" />
             </LinearLayout>
 
 
@@ -284,23 +284,22 @@
         android:id="@+id/single_fb_dial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_call_white_24dp"
-        app:fabSize="mini"
-        app:elevation="0dp"
         android:layout_marginRight="75dp"
+        android:src="@drawable/ic_call_white_24dp"
+        app:elevation="0dp"
+        app:fabSize="mini"
         app:layout_anchor="@id/main.appbar"
-        app:layout_anchorGravity="right|bottom"
-       />
+        app:layout_anchorGravity="right|bottom" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/single_fb_send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="120dp"
         android:src="@drawable/ic_send_black_24dp"
         app:fabSize="mini"
         app:layout_anchor="@id/main.appbar"
-        app:layout_anchorGravity="bottom|right|end"
-        android:layout_marginRight="120dp"/>
+        app:layout_anchorGravity="bottom|right|end" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/single_delete"

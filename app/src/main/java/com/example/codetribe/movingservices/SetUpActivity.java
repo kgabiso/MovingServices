@@ -28,7 +28,7 @@ import dmax.dialog.SpotsDialog;
 public class SetUpActivity extends AppCompatActivity {
 
    private CircleImageView profilePic;
-   private EditText firstName, lastName;
+   private EditText firstName, lastName,contact;
     private Button btn_submit;
     private static final int Galleery_REQUEST = 1;
     private FloatingActionButton profilebutton;
@@ -53,7 +53,7 @@ public class SetUpActivity extends AppCompatActivity {
         firstName =(EditText)findViewById(R.id.profile_name);
         lastName=(EditText)findViewById(R.id.last_name);
         btn_submit = (Button)findViewById(R.id.btn_submit);
-
+        contact =(EditText)findViewById(R.id.last_contact);
         profilebutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,31 +86,44 @@ public class SetUpActivity extends AppCompatActivity {
         final String name = firstName.getText().toString().trim();
         final String lname = lastName.getText().toString().trim();
         final String userID = mAuth.getCurrentUser().getUid();
+        final String procontact = contact.getText().toString().trim();
 
-        if(!TextUtils.isEmpty(name) && imgUri != null && !TextUtils.isEmpty(lname)){
 
+        if(!TextUtils.isEmpty(name)){
+            if(!TextUtils.isEmpty(lname)) {
+                if(imgUri != null) {
+                    if(!TextUtils.isEmpty(procontact)) {
+                        dialog.show();
+                        StorageReference filepath = storage.child(imgUri.getLastPathSegment());
+                        filepath.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                String downloadUri = taskSnapshot.getDownloadUrl().toString();
+                                mDatabaseRef.child(userID).child("name").setValue(name);
+                                mDatabaseRef.child(userID).child("lname").setValue(lname);
+                                mDatabaseRef.child(userID).child("contact").setValue(procontact);
+                                mDatabaseRef.child(userID).child("email").setValue(mAuth.getCurrentUser().getEmail());
+                                mDatabaseRef.child(userID).child("profileimage").setValue(downloadUri);
 
-            dialog.show();
-            StorageReference filepath = storage.child(imgUri.getLastPathSegment());
-            filepath.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    String downloadUri = taskSnapshot.getDownloadUrl().toString();
-                    mDatabaseRef.child(userID).child("name").setValue(name);
-                    mDatabaseRef.child(userID).child("lname").setValue(lastName);
-                    mDatabaseRef.child(userID).child("profileimage").setValue(downloadUri);
-
-                    Intent mainIntent = new Intent(SetUpActivity.this,MainActivity.class);
-                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(mainIntent);
-                    finish();
-                    dialog.dismiss();
+                                Intent mainIntent = new Intent(SetUpActivity.this, MainActivity.class);
+                                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(mainIntent);
+                                finish();
+                                dialog.dismiss();
+                            }
+                        });
+                    }else {
+                        Toast.makeText(getApplicationContext(),"Please enter contact number ",Toast.LENGTH_SHORT).show();
+                    }
+                }else {
+                    Toast.makeText(getApplicationContext(),"Please choose display picture ",Toast.LENGTH_SHORT).show();
                 }
-            });
-
+            }else {
+                Toast.makeText(getApplicationContext(),"Please enter Last name",Toast.LENGTH_SHORT).show();
+            }
         }
         else {
-            Toast.makeText(getApplicationContext(),"Please enter Display name and Profile picture to complete ",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"Please enter Display name",Toast.LENGTH_SHORT).show();
         }
     }
 

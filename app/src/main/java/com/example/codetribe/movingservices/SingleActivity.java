@@ -1,10 +1,12 @@
 package com.example.codetribe.movingservices;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -45,15 +47,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SingleActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-    private TextView username, title, description, phoneNumber, email, location, likes, dislikes, price,img_request;
+    private TextView username, title, description, phoneNumber, email, location, likes, dislikes, price, single_send_request;
     private ImageView profilePic, main_image, img_dial;
     private ImageButton img_like, img_dislike;
-    private FloatingActionButton delete_btn, fb_dial,fb,fb_send;
+    private FloatingActionButton delete_btn, fb_dial, fb, fb_send;
     private CircleImageView pro_pic;
     private DatabaseReference mDataRef;
     private DatabaseReference mDataLike;
     private DatabaseReference mDataDislike;
     private DatabaseReference mDataProfile;
+    private DatabaseReference mDataRequest;
     private FirebaseAuth mAuth;
     private LinearLayout lin_email, lin_phone, location_finder;
     private String single_Post_key;
@@ -68,9 +71,11 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
     double lat, lng;
     LovelyStandardDialog lovelyStandardDialog;
     CollapsingToolbarLayout collapsingToolbarLayout;
-    private boolean mClick = true ;
-    private Animation fab_open,fab_close,rotate_forward,rotate_backward;
-    private RotateAnimation rotate_clock,rotate_antiClock;
+    private boolean mClick = true;
+    private Animation fab_open, fab_close, rotate_forward, rotate_backward;
+    private RotateAnimation rotate_clock, rotate_antiClock;
+    private static String Single = "SingleActivity";
+
     public SingleActivity() {
     }
 
@@ -89,13 +94,14 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
         mAuth = FirebaseAuth.getInstance();
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        if(bundle != null) {
+        if (bundle != null) {
             single_Post_key = getIntent().getExtras().getString("Single_Post_id");
         }
         mDataRef = FirebaseDatabase.getInstance().getReference().child("Moving_Services");
         mDataLike = FirebaseDatabase.getInstance().getReference().child("likes");
         mDataDislike = FirebaseDatabase.getInstance().getReference().child("Dislikes");
         mDataProfile = FirebaseDatabase.getInstance().getReference().child("users");
+        mDataRequest = FirebaseDatabase.getInstance().getReference().child("Request");
         //keep synced
         mDataDislike.keepSynced(true);
         mDataProfile.keepSynced(true);
@@ -114,8 +120,8 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
         likes = (TextView) findViewById(R.id.single_Likes);
         dislikes = (TextView) findViewById(R.id.single_Dislikes);
         fb_dial = (FloatingActionButton) findViewById(R.id.single_fb_dial);
-        fb =(FloatingActionButton)findViewById(R.id.single_fb);
-        fb_send =(FloatingActionButton)findViewById(R.id.single_fb_send);
+        fb = (FloatingActionButton) findViewById(R.id.single_fb);
+        fb_send = (FloatingActionButton) findViewById(R.id.single_fb_send);
         pro_pic = (CircleImageView) findViewById(R.id.single_profile_image);
         lin_email = (LinearLayout) findViewById(R.id.single_lin_email);
         lin_phone = (LinearLayout) findViewById(R.id.single_lin_phone);
@@ -124,11 +130,11 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
         img_dislike = (ImageButton) findViewById(R.id.single_img_dislikes);
         img_like = (ImageButton) findViewById(R.id.single_img_likes);
         img_dial = (ImageView) findViewById(R.id.single_dial);
-        img_request = (TextView) findViewById(R.id.single_send_request);
-        location_finder =(LinearLayout)findViewById(R.id.location_finder);
+        single_send_request = (TextView) findViewById(R.id.single_send_request);
+        location_finder = (LinearLayout) findViewById(R.id.location_finder);
         //+++++++++++++++++animations===========================
         fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
-        fab_close = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
+        fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
 
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
         fb_send.setVisibility(View.INVISIBLE);
@@ -140,16 +146,17 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), MapActivity.class);
+                i.putExtra("Single",Single);
                 i.putExtra("Latitude", single_post_lat);
                 i.putExtra("Longitude", single_post_long);
                 i.putExtra("location", single_post_location);
                 i.putExtra("title", single_post_title);
-                i.putExtra("price",sing_post_price);
+                i.putExtra("price", sing_post_price);
                 startActivity(i);
             }
         });
-
-        img_request.setOnClickListener(new View.OnClickListener() {
+        numberRequest();
+        single_send_request.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -241,10 +248,10 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
         fb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mClick) {
+                if (mClick) {
                     open_Fab();
-                    mClick= false;
-                }else {
+                    mClick = false;
+                } else {
                     close_fab();
                     mClick = true;
                 }
@@ -255,9 +262,10 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
             public void onClick(View view) {
                 close_fab();
                 mClick = true;
-                Intent i = new Intent(getApplicationContext(),Send_RequestActivity.class);
-                i.putExtra("Post_key",single_Post_key);
-                i.putExtra("owerID",single_post_uID);
+                Intent i = new Intent(getApplicationContext(), Send_RequestActivity.class);
+                i.putExtra("Post_key", single_Post_key);
+                i.putExtra("owerID", single_post_uID);
+                i.putExtra("price", sing_post_price);
                 startActivity(i);
             }
         });
@@ -344,21 +352,41 @@ public class SingleActivity extends AppCompatActivity implements OnMapReadyCallb
         lat = single_post_lat;
         lng = single_post_long;
     }
-public void open_Fab(){
-    rotate_clock = new RotateAnimation(0, 90, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-    rotate_clock.setFillAfter(true);
-    rotate_clock.setDuration(300);
-    rotate_clock.setInterpolator(new AccelerateDecelerateInterpolator());
 
-    fb_send.setVisibility(View.VISIBLE);
-    fb_dial.setVisibility(View.VISIBLE);
-    fb_send.setClickable(true);
-    fb_dial.setClickable(true);
-    fb.startAnimation(rotate_clock);
-    fb_send.startAnimation(fab_open);
-    fb_dial.startAnimation(fab_open);
-}
-    public void close_fab(){
+    public void numberRequest() {
+        mDataRequest.orderByChild("post_id").equalTo(single_Post_key).addValueEventListener(new ValueEventListener() {
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int num = (int) dataSnapshot.getChildrenCount();
+                single_send_request.setText("Request (" + num + ")");
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void open_Fab() {
+        rotate_clock = new RotateAnimation(0, 90, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        rotate_clock.setFillAfter(true);
+        rotate_clock.setDuration(300);
+        rotate_clock.setInterpolator(new AccelerateDecelerateInterpolator());
+
+        fb_send.setVisibility(View.VISIBLE);
+        fb_dial.setVisibility(View.VISIBLE);
+        fb_send.setClickable(true);
+        fb_dial.setClickable(true);
+        fb.startAnimation(rotate_clock);
+        fb_send.startAnimation(fab_open);
+        fb_dial.startAnimation(fab_open);
+    }
+
+    public void close_fab() {
         rotate_antiClock = new RotateAnimation(90, 0, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         rotate_antiClock.setFillAfter(true);
         rotate_antiClock.setDuration(300);
@@ -372,6 +400,7 @@ public void open_Fab(){
         fb_send.startAnimation(fab_close);
         fb_dial.startAnimation(fab_close);
     }
+
     protected void sendEmail(String To) {
         Log.i("Send email", "");
         String[] TO = {To};
@@ -414,12 +443,12 @@ public void open_Fab(){
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())) {
-                   // img_like.setImageResource(R.drawable.ic_mood_active_24dp1);
+                    // img_like.setImageResource(R.drawable.ic_mood_active_24dp1);
                     likes.setText("Likes " + (int) dataSnapshot.child(post_key).getChildrenCount());
                     likes.setTextColor(ContextCompat.getColor(SingleActivity.this, R.color.accept));
                     img_dislike.setEnabled(false);
                 } else {
-                   // img_like.setImageResource(R.drawable.ic_mood_black_24dp);
+                    // img_like.setImageResource(R.drawable.ic_mood_black_24dp);
                     likes.setText("Likes " + (int) dataSnapshot.child(post_key).getChildrenCount());
                     likes.setTextColor(ContextCompat.getColor(SingleActivity.this, R.color.editText));
                     img_dislike.setEnabled(true);
@@ -477,7 +506,7 @@ public void open_Fab(){
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-       // LatLng position = new LatLng(lat, lng);
+        // LatLng position = new LatLng(lat, lng);
         // Add a marker in Sydney and move the camera
 
 //        mMap.addMarker(new MarkerOptions().position(position).title("Marker in Sydney").snippet("check out the place").draggable(false).icon(BitmapDescriptorFactory.fromResource(R.drawable.placeholder)));

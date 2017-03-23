@@ -58,7 +58,6 @@ public class RegisterActivity extends AppCompatActivity {
 
             if(CPassword.equals(password)) {
                 dialog.show();
-
                 mAthu.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 
                     @Override

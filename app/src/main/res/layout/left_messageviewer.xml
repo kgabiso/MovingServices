@@ -1,155 +1,286 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
     <LinearLayout
-        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@color/secondaryText" />
+
+        <ImageView
+            android:id="@+id/img_status1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:src="@drawable/ic_done_all_black_24dp"
+            android:textColor="@color/secondaryText" />
+
+        <TextView
+            android:id="@+id/mes_status1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:text="@string/accept" />
+        <TextView
+            android:id="@+id/mes_dateDif"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:text="(days left)" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@color/secondaryText" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lin_card"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="left"
-        >
+        android:orientation="horizontal">
+
         <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/messengerImageView"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:id="@+id/messengerImageView"
-            android:src="@drawable/default_pic"/>
+            android:src="@drawable/default_pic" />
 
         <android.support.v7.widget.CardView
+            android:id="@+id/mes_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
             android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:elevation="5dp"
             app:cardBackgroundColor="@color/colorPrimary"
             app:cardCornerRadius="10dp"
-            android:id="@+id/mes_card"
-            app:cardElevation="5dp"
-            android:elevation="5dp">
-
+            app:cardElevation="5dp">
             <LinearLayout
+                android:layout_width="500dp"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp">
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                android:id="@+id/lin_status"
+                android:rotation="30"
+                android:layout_gravity="center"
+                >
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="@color/route"/>
                 <TextView
+                    android:id="@+id/mes_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:id="@+id/mes_username"
-                    android:textColor="@color/cardview_light_background"
-                    android:text="message"
-                    android:paddingRight="5dp"
-                    android:paddingBottom="5dp"
-                    android:layout_weight="0"/>
+                    android:text="Status"
+                    android:layout_gravity="center"
+                    android:textColor="@color/route"
+                    android:textStyle="bold"
+                    android:textSize="20dp"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="@color/route"/>
 
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:id="@+id/mes_message"
-                    android:textColor="@color/secondaryText"
-                    android:text="message"
-                    android:paddingLeft="@dimen/activity_vertical_margin"
-                    android:paddingBottom="@dimen/activity_vertical_margin"
-                    android:paddingRight="@dimen/activity_vertical_margin"
-                    android:layout_weight="0"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:id="@+id/mes_location_from"
-                    android:textColor="@color/editText"
-                    android:text="location_from"
-                    android:paddingRight="5dp"
-                    android:paddingBottom="5dp"
-                    android:layout_weight="0"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:id="@+id/mes_location_to"
-                    android:textColor="@color/editText"
-                    android:text="location_to"
-                    android:paddingRight="5dp"
-                    android:paddingBottom="5dp"
-                    android:layout_weight="0"/>
-
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="10dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:id="@+id/mes_date"
-                    android:textColor="@color/editText"
-                    android:text="date"
-                    android:gravity="center_horizontal"
-                    android:paddingRight="5dp"
-                    android:paddingBottom="5dp"
-                    android:layout_weight="1"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:id="@+id/mes_status"
-                    android:textColor="@color/editText"
-                    android:text="panding"
-                    android:gravity="center_horizontal"
-                    android:paddingRight="5dp"
-                    android:paddingBottom="5dp"
-                    android:layout_weight="1"/>
-            </LinearLayout>
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/mes_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:paddingBottom="5dp"
+                    android:paddingRight="5dp"
+                    android:text="message"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/cardview_light_background" />
+
+
+                <TextView
+                    android:id="@+id/mes_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:paddingBottom="@dimen/activity_vertical_margin"
+                    android:paddingLeft="@dimen/activity_vertical_margin"
+                    android:paddingRight="@dimen/activity_vertical_margin"
+                    android:text="message"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/secondaryText" />
+
+                <TextView
+                    android:id="@+id/mes_location_from"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:paddingBottom="5dp"
+                    android:paddingRight="5dp"
+                    android:text="location_from"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/editText" />
+
+                <TextView
+                    android:id="@+id/mes_location_to"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:paddingBottom="5dp"
+                    android:paddingRight="5dp"
+                    android:text="location_to"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/editText" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:id="@+id/lin_mess_contact">
+                    <TextView
+                        android:id="@+id/mes_contact"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+                        android:paddingBottom="5dp"
+                        android:paddingRight="5dp"
+                        android:text="location_to"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/editText" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_call_white_24dp"
+                        android:layout_gravity="right"
+                        />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:id="@+id/lin_mess_email">
+                    <TextView
+                        android:id="@+id/mes_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+                        android:paddingBottom="5dp"
+                        android:paddingRight="5dp"
+                        android:text="location_to"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/editText" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/gmail_logo"
+                        android:tint="@color/editText"
+                        android:layout_gravity="right"
+                        />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/mes_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:paddingBottom="5dp"
+                        android:paddingRight="5dp"
+                        android:text="date"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/editText" />
+
+                  <!--  <TextView
+                        android:id="@+id/mes_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:paddingBottom="5dp"
+                        android:paddingRight="5dp"
+                        android:text="panding"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/editText" />-->
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
                     android:gravity="center"
-                    android:layout_marginBottom="10dp">
+                    android:orientation="horizontal"
+                    android:id="@+id/lin_button">
+
                     <ImageButton
+                        android:id="@+id/mes_accept"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
-                        android:id="@+id/mes_accept"
                         android:background="@drawable/round_imageview"
                         android:backgroundTint="@color/accept"
-                        android:src="@drawable/ic_accept"
                         android:scaleType="centerCrop"
-                        />
+                        android:src="@drawable/ic_accept" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Accept"
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:padding="5dp"
-                        android:textColor="@color/accept"/>
+                        android:text="Accept"
+                        android:textColor="@color/accept" />
+
                     <ImageButton
+                        android:id="@+id/mes_reject"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
-                        android:id="@+id/mes_reject"
                         android:background="@drawable/round_dislike"
                         android:backgroundTint="@color/reject"
-                        android:src="@drawable/ic_reject"
                         android:scaleType="fitStart"
-                       />
+                        android:src="@drawable/ic_reject" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Reject"
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:padding="5dp"
-                        android:textColor="@color/reject"/>
+                        android:text="Reject"
+                        android:textColor="@color/reject" />
 
+                    <ImageButton
+                        android:id="@+id/mes_maps"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:background="@drawable/round_dislike"
+                        android:scaleType="fitStart"
+                        android:src="@drawable/route"
+                        android:visibility="gone" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -157,4 +288,4 @@
         </android.support.v7.widget.CardView>
 
     </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

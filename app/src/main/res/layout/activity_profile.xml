@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     tools:context="com.example.codetribe.movingservices.ProfileActivity">
+
+
+<LinearLayout
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:orientation="vertical"
+    android:layout_above="@+id/btn_update">
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,6 +78,14 @@
                     android:paddingLeft="10dp"
                     android:textSize="15sp"
                     android:id="@+id/txt_profile_email"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:hint="074 257 8827"
+                    android:paddingLeft="10dp"
+                    android:textSize="15sp"
+                    android:id="@+id/txt_profile_contact"/>
 
 
                 <View
@@ -82,8 +98,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginTop="@dimen/activity_horizontal_margin"
+
                     android:drawablePadding="5dp"
                     android:drawableRight="@drawable/ic_sign_out"
                     android:gravity="center_vertical"
@@ -96,23 +111,19 @@
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_weight="1">
-
-        <android.support.v7.widget.CardView
+    <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
+            android:layout_height="wrap_content"
+           app:cardElevation="5dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:paddingBottom="@dimen/activity_horizontal_margin">
+               >
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -127,7 +138,8 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="0.5dp"
-                    android:layout_margin="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="5dp"
                     android:background="@color/editText" />
 
                 <EditText
@@ -153,7 +165,6 @@
                     android:hint="Last name"
                     android:inputType="textPersonName"
                     android:padding="10dp" />
-
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -161,24 +172,74 @@
                     android:layout_margin="10dp"
                     android:background="@drawable/textview_background"
                     android:ems="10"
-                    android:hint="Display name"
+                    android:id="@+id/ed_contact"
+                    android:hint="Contact number"
                     android:inputType="textPersonName"
                     android:padding="10dp" />
-
-                <TextView
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_margin="5dp"
+                    android:background="@color/editText" />
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:drawablePadding="@dimen/activity_horizontal_margin"
-                    android:drawableRight="@drawable/ic_refresh"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:text="Refresh"
                     android:id="@+id/txtRefresh"
-                    android:textColor="@color/colorAccent" />
+                    android:layout_gravity="center_horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="@dimen/activity_horizontal_margin"
+                        android:text="Requests"
+                        android:layout_gravity="center_horizontal"
+
+                        android:textColor="@color/colorAccent" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:id="@+id/txtRefresh_icon"
+                        android:src="@drawable/ic_expand_more_black_24dp"
+                        android:tint="@color/colorAccent"/>
+                    <TextView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:drawablePadding="@dimen/activity_horizontal_margin"
+                        android:text="0"
+                        android:id="@+id/num_request"
+                        android:textSize="10dp"
+                        android:layout_gravity="center_horizontal"
+                        android:background="@drawable/round_marker"
+                        android:backgroundTint="#D1C4E9"
+                        android:gravity="center_horizontal|center"
+                        android:textColor="@color/cardview_light_background"/>
+                </LinearLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/prof_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/textview_background"
+                    android:layout_weight="0.11"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"
+                    android:layout_marginBottom="10dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+
+                    />
             </LinearLayout>
         </android.support.v7.widget.CardView>
-    </ScrollView>
 
+
+
+
+
+</LinearLayout>
     <Button
         android:id="@+id/btn_update"
         android:layout_width="match_parent"
@@ -187,4 +248,4 @@
         android:background="@color/colorPrimary"
         android:text="Update"
         android:textColor="@android:color/white" />
-</LinearLayout>
+</RelativeLayout>

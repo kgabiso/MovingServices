@@ -32,6 +32,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.github.arturogutierrez.Badges;
+import com.github.arturogutierrez.BadgesNotSupportedException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mDatabaseLikes;
     private DatabaseReference mDatabaseDislikes;
-    private DatabaseReference mDataUsers;
+    private DatabaseReference mDataUsers, mDataRequest;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListner;
     private boolean mProcessLike = false;
@@ -70,10 +72,11 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
     private BroadcastReceiver broadcastReceiver;
     private LinearLayout mRevealView;
     private boolean hidden = true;
-    private ImageButton add_btn , request_btn, settings_btn, contact_btn;
-    private CircleImageView profile_btn,sign_out_btn;
+    private ImageButton add_btn, request_btn, settings_btn, contact_btn;
+    private CircleImageView profile_btn, sign_out_btn;
     private SupportAnimator animator_reverse;
     private SupportAnimator animator;
+    private TextView request_count;
 
     public MainActivity() {
 
@@ -89,21 +92,24 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
         mDataUsers = FirebaseDatabase.getInstance().getReference().child("users");
         mDatabaseLikes = FirebaseDatabase.getInstance().getReference().child("likes");
         mDatabaseDislikes = FirebaseDatabase.getInstance().getReference().child("Dislikes");
+        mDataRequest = FirebaseDatabase.getInstance().getReference().child("Request");
         mAuth = FirebaseAuth.getInstance();
         //keep synced
         mDataUsers.keepSynced(true);
         mDatabaseRef.keepSynced(true);
         mDatabaseLikes.keepSynced(true);
         mDatabaseDislikes.keepSynced(true);
+        mDataRequest.keepSynced(true);
         no_data_found = (ImageView) findViewById(R.id.No_imageView);
 
         //==================== menu ==========================
-        add_btn = (ImageButton)findViewById(R.id.menu_add);
-        profile_btn =(CircleImageView)findViewById(R.id.menu_profile);
-        request_btn =(ImageButton)findViewById(R.id.menu_request);
-        settings_btn =(ImageButton)findViewById(R.id.menu_settings);
-        contact_btn =(ImageButton)findViewById(R.id.menu_about);
-        sign_out_btn =(CircleImageView)findViewById(R.id.menu_sign_out);
+        add_btn = (ImageButton) findViewById(R.id.menu_add);
+        profile_btn = (CircleImageView) findViewById(R.id.menu_profile);
+        request_btn = (ImageButton) findViewById(R.id.menu_request);
+        settings_btn = (ImageButton) findViewById(R.id.menu_settings);
+        contact_btn = (ImageButton) findViewById(R.id.menu_about);
+        sign_out_btn = (CircleImageView) findViewById(R.id.menu_sign_out);
+        request_count = (TextView) findViewById(R.id.count_request);
         mRevealView = (LinearLayout) findViewById(R.id.reveal_items);
         mRevealView.setVisibility(View.GONE);
 
@@ -178,6 +184,19 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
             }
         });
 
+        mDataUsers.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child(mAuth.getCurrentUser().getUid()).child("email").getValue() == null) {
+                    mDataUsers.child(mAuth.getCurrentUser().getUid()).child("email").setValue(mAuth.getCurrentUser().getEmail());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         mAuthListner = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -218,9 +237,10 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
                 hideRevealView();
             }
         });
-
-
+        countRequest();
+        startInternService();
     }
+
     protected void sendEmail(String To) {
         Log.i("Send email", "");
         String[] TO = {To};
@@ -241,9 +261,50 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
         }
     }
 
+    public void countRequest() {
+        if (mAuth.getCurrentUser() != null) {
+            mDataRequest.orderByChild("owner_id").equalTo(mAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    int count = 0;
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+                        if (dataSnapshot.child(child.getKey()).child("status").getValue() != null) {
+                            if (dataSnapshot.child(child.getKey()).child("status").getValue().toString().equals("Pending")) {
+                                count = count + 1;
+                            }
+                        }
+                    }
+                    if (count > 0) {
+                        request_count.setText("" + count);
+                        if (count > 99) {
+                            request_count.setText("99+");
+                        }
+                        try {
+                            Badges.setBadge(getApplicationContext(), count);
+                        } catch (BadgesNotSupportedException badgesNotSupportedException) {
+                            //Log.d(TAG, badgesNotSupportedException.getMessage());
+                        }
+                    } else {
+
+                        request_count.setVisibility(View.GONE);
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+public void startInternService(){
+    Intent i = new Intent(getApplicationContext(),BadgeIntentService.class);
+    startService(i);
+}
     //fetch user profile
-    public void displayPicture(){
-        if(mAuth.getCurrentUser() != null) {
+    public void displayPicture() {
+        if (mAuth.getCurrentUser() != null) {
             mDataUsers.child(mAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -273,26 +334,24 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.action_add) {
-//            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-//            startActivity(intent);
-//            close_fab();
+
             int cx = (mRevealView.getLeft() + mRevealView.getRight());
             int cy = mRevealView.getTop();
             int radius = Math.max(mRevealView.getWidth(), mRevealView.getHeight());
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                 animator =
+                animator =
                         ViewAnimationUtils.createCircularReveal(mRevealView, cx, cy, 0, radius);
                 animator.setInterpolator(new AccelerateDecelerateInterpolator());
                 animator.setDuration(700);
 
-                 animator_reverse = animator.reverse();
+                animator_reverse = animator.reverse();
 
                 if (hidden) {
                     mRevealView.setVisibility(View.VISIBLE);
                     animator.start();
                     hidden = false;
-                }else {
+                } else {
                     animator_reverse.addListener(new SupportAnimator.AnimatorListener() {
                         @Override
                         public void onAnimationStart() {
@@ -319,7 +378,8 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
                     animator_reverse.start();
                 } // Android LOLIPOP And ABOVE Version
 
-            } if (hidden) {
+            }
+            if (hidden) {
                 Animator anim = android.view.ViewAnimationUtils.
                         createCircularReveal(mRevealView, cx, cy, 0, radius);
                 mRevealView.setVisibility(View.VISIBLE);
@@ -342,6 +402,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
 
         return super.onOptionsItemSelected(item);
     }
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void hideRevealView() {
         // Android LOLIPOP And ABOVE Version
@@ -362,6 +423,31 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
             anim.start();
         }
     }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public void onBackPressed() {
+
+        int cx = (mRevealView.getLeft() + mRevealView.getRight());
+        int cy = mRevealView.getTop();
+        int radius = Math.max(mRevealView.getWidth(), mRevealView.getHeight());
+        if (mRevealView.getVisibility() == View.VISIBLE) {
+            Animator anim = android.view.ViewAnimationUtils.
+                    createCircularReveal(mRevealView, cx, cy, radius, 0);
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    mRevealView.setVisibility(View.INVISIBLE);
+                    hidden = true;
+                }
+            });
+            anim.start();
+        }else {
+            super.onBackPressed();
+        }
+    }
+
     private void logout() {
         mAuth.signOut();
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
@@ -406,6 +492,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
                 R.layout.rows,
                 MovingService_ViewHolder.class, mDatabaseRef
         ) {
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             @Override
             protected void populateViewHolder(final MovingService_ViewHolder viewHolder, final MovingServices model, int position) {
 
@@ -416,8 +503,9 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
                 viewHolder.setEmail(model.getEmail());
                 viewHolder.setImage(getApplicationContext(), model.getImage());
                 viewHolder.setLocation(model.getLocation());
-                viewHolder.setImg_likes(post_key);
+                viewHolder.setImg_likes(post_key, getApplicationContext());
                 viewHolder.setDate(model.getDate());
+                viewHolder.img_dislike.setBackgroundTintList(getResources().getColorStateList(R.color.reject));
 
                 viewHolder.post_Image.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -579,7 +667,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
             mDatabaselikes.keepSynced(true);
             mDatabaseDislikes.keepSynced(true);
 
-            img_send = (ImageButton) nView.findViewById(R.id.img_send);
+
             post_Image = (ImageView) nView.findViewById(R.id.img_Post);
             post_Contact = (TextView) nView.findViewById(R.id.txtContactNumber);
             post_email = (TextView) nView.findViewById(R.id.txtContactEmail);
@@ -593,7 +681,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
 
         }
 
-        public void setImg_likes(final String post_key) {
+        public void setImg_likes(final String post_key, final Context context) {
 
             mDatabaselikes.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -623,6 +711,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
 
             });
             mDatabaseDislikes.addValueEventListener(new ValueEventListener() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     try {
@@ -630,6 +719,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
                             //img_dislike.setImageResource(R.drawable.ic_mood_bad_active_24dp1);
                             post_dislike.setText(" " + (int) dataSnapshot.child(post_key).getChildrenCount());
                             post_dislike.setTextColor(ContextCompat.getColor(nView.getContext(), R.color.reject));
+                            img_dislike.setBackgroundTintList(context.getResources().getColorStateList(R.color.reject));
                             img_likes.setEnabled(false);
 
                         } else {
@@ -637,6 +727,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
                             //img_dislike.setImageResource(R.drawable.ic_mood_bad_black_24dp);
                             post_dislike.setText(" " + (int) dataSnapshot.child(post_key).getChildrenCount());
                             post_dislike.setTextColor(ContextCompat.getColor(nView.getContext(), R.color.editText));
+                            img_dislike.setBackgroundTintList(context.getResources().getColorStateList(R.color.reject));
                             img_likes.setEnabled(true);
                         }
                     } catch (Exception e) {

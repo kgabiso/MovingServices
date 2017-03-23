@@ -39,7 +39,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -60,29 +59,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private GoogleMap googleMap;
     private String serverKey = "AIzaSyCOuDlu_I4fGpPlulUrUHtC-9t-9zoy2pE";
-    private double lng,lat;
-    private double long_from,long_to,lat_from,lat_to;
-    private double longitude,latitude;
-    private String location,title;
+    private double lng, lat;
+    private double long_from, long_to, lat_from, lat_to;
+    private double longitude, latitude;
+    private String location, title;
     private double price;
     private String post_key;
     private FloatingActionButton location_picker;
-    private LatLng origin ;
+    private LatLng origin;
     private LatLng destination;
     GoogleApiClient googleApiClient;
     LovelyStandardDialog lovelyStandardDialog;
     private SpotsDialog dialog;
-   private TextView txt_distance,txt_time,txt_travel_time;
+    private TextView txt_distance, txt_time, txt_travel_time;
     private int routecount = 0;
     private CircleImageView markerImageView;
     private String uriProfile;
     private FirebaseAuth mAuth;
     private DatabaseReference mDB_users;
+    private String Single = "SingleActivity";
+    private String Message = "MessageActivity";
+    String activity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fullmap);
         mapFragment.getMapAsync(this);
@@ -94,10 +97,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .build();
         lovelyStandardDialog = new LovelyStandardDialog(this);
         dialog = new SpotsDialog(this);
-        txt_distance = (TextView)findViewById(R.id.map_distance);
-        txt_time =(TextView)findViewById(R.id.map_time);
-        txt_travel_time =(TextView)findViewById(R.id.map_travel_time);
-        location_picker =(FloatingActionButton)findViewById(R.id.fb_location_picker);
+        txt_distance = (TextView) findViewById(R.id.map_distance);
+        txt_time = (TextView) findViewById(R.id.map_time);
+        txt_travel_time = (TextView) findViewById(R.id.map_travel_time);
+        location_picker = (FloatingActionButton) findViewById(R.id.fb_location_picker);
         txt_time.setText("Time travelled : 0 min");
         txt_distance.setText("Distance : 0 km");
         txt_travel_time.setText("Pick up location \nDrop location :");
@@ -111,35 +114,40 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         location = getIntent().getExtras().getString("location");
         title = getIntent().getExtras().getString("title");
 
+
         lat_from = getIntent().getExtras().getDouble("latitude_from");
         long_from = getIntent().getExtras().getDouble("longitude_from");
         lat_to = getIntent().getExtras().getDouble("latitude_to");
         long_to = getIntent().getExtras().getDouble("longitude_to");
-        origin = new  LatLng(long_from,lat_from);
+        origin = new LatLng(long_from, lat_from);
         destination = new LatLng(long_to, lat_to);
         post_key = getIntent().getExtras().getString("post_key");
+        requestDirection();
 
         //==========
         location_picker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if(routecount <= 2) {
+                if (routecount <= 2) {
 
                     requestDirection();
 
-                }else {
+                } else {
                     routecount = 0;
                     requestDirection();
                 }
             }
         });
-        getCurrentLocation();
+
         getProfile_Uri();
+
+
     }
 
     private void getCurrentLocation() {
         //Creating a location object
+        // final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -150,6 +158,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+//        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) )
+//            {
+//                lovelyStandardDialog
+//                        .setTopColorRes(R.color.colorAccent)
+//                        .setButtonsColorRes(R.color.colorPrimaryDark)
+//                        .setIcon(R.drawable.delivery_truck_icon)
+//                        .setTitle("GPS settings")
+//                        .setMessage("Your GPS seems to be disabled, do you want to enable it?")
+//                        .setPositiveButton(android.R.string.ok, new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View view) {
+//                                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+//                            }
+//                        })
+//                        .setNegativeButton(android.R.string.no,null)
+//                        .show();
+//            }
         Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         if (location != null) {
             //Getting longitude and latitude
@@ -159,8 +184,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             getProfile_Uri();
         }
     }
+
     //Function to move the map
     private void moveMap() {
+
         double radiusInMeters = 1000.0;
         int strokeColor = 0xffff0000; //red outline
         int shadeColor = 0x44ff0000;
@@ -168,19 +195,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         String msg = latitude + ", " + longitude;
         Geocoder geocoder;
         //Creating a LatLng Object to store Coordinates
-        LatLng latLng = new LatLng(latitude, longitude);
-
-        //Adding marker to map
-        googleMap.addMarker(new MarkerOptions()
-                .position(latLng) //setting position
-                .draggable(true) //Making the marker draggable
-                .title("Current Location").icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(uriProfile))));//Adding a title
-        googleMap.addCircle(new CircleOptions().center(latLng).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8));
-        //Moving the camera
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        //Animating the camera
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(10));
-
         googleMap.addMarker(new MarkerOptions()
                 .position(origin) //setting position
                 .draggable(true) //Making the marker draggable
@@ -190,7 +204,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .position(destination) //setting position
                 .draggable(true) //Making the marker draggable
                 .title("Moving to"));//Adding a title
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(origin));
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+
+
     }
+
     public void requestDirection() {
         dialog.show();
         dialog.setMessage("getting Map Directions");
@@ -208,14 +227,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
         LatLng latLng = new LatLng(-34, 151);
-
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        LatLng latLng_truck = new LatLng(lat, lng);
+        googleMap.addMarker(new MarkerOptions()
+                .position(latLng_truck) //setting position
+                .draggable(true) //Making the marker draggable
+                .title(title).snippet(location).icon(BitmapDescriptorFactory.fromResource(R.drawable.delivery_truck_map)));//Adding a title
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng_truck));
         //Animating the camera
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+
     }
 
     private Bitmap getMarkerBitmapFromView(String resId) {
@@ -239,6 +264,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         customMarkerView.draw(canvas);
         return returnedBitmap;
     }
+
     private void getProfile_Uri() {
 
         String uid = mAuth.getCurrentUser().getUid();
@@ -262,7 +288,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     protected void onStart() {
-
+        getCurrentLocation();
         googleApiClient.connect();
         super.onStart();
     }
@@ -271,6 +297,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onStop() {
         googleApiClient.disconnect();
         super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        getCurrentLocation();
+        super.onResume();
+
     }
 
     @Override
@@ -298,6 +331,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             String Distance = null;
             String Start_Location = null;
             String End_location = null;
+
             if (routecount == 0) {
                 googleMap.clear();
                 int color = R.color.route;
@@ -306,32 +340,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 time = String.valueOf(direction.getRouteList().get(0).getLegList().get(0).getDuration().getText());
                 Start_Location = String.valueOf(direction.getRouteList().get(0).getLegList().get(0).getStartAddress());
                 End_location = String.valueOf(direction.getRouteList().get(0).getLegList().get(0).getEndAddress());
+                float dist_meters = Float.parseFloat(direction.getRouteList().get(0).getLegList().get(0).getDistance().getValue());
                 location_picker.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(color)));
                 //location_picker.setBackgroundTintList(ColorStateList.valueOf(R.color.route));
                 googleMap.addPolyline(DirectionConverter.createPolyline(this, directionPositionList, 5, getResources().getColor(color)));
             } else {
                 googleMap.clear();
                 int[] colors = {R.color.altern_rout, R.color.altern_rout1, R.color.altern_rout2};
-                Route route = direction.getRouteList().get(routecount);
-                int color = colors[routecount];
-                ArrayList<LatLng> directionPositionList = route.getLegList().get(0).getDirectionPoint();
-                Distance = String.valueOf(direction.getRouteList().get(routecount).getLegList().get(0).getDistance().getText());
-                time = String.valueOf(direction.getRouteList().get(routecount).getLegList().get(0).getDuration().getText());
-                Start_Location = String.valueOf(direction.getRouteList().get(0).getLegList().get(0).getStartAddress());
-                End_location = String.valueOf(direction.getRouteList().get(0).getLegList().get(0).getEndAddress());
-                location_picker.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(color)));
-                googleMap.addPolyline(DirectionConverter.createPolyline(this, directionPositionList, 5, getResources().getColor(color)));
-                Toast.makeText(getApplicationContext(), "Alternative Route " + routecount, Toast.LENGTH_SHORT).show();
+                try {
+                    Route route = direction.getRouteList().get(routecount);
+                    int color = colors[routecount];
+                    ArrayList<LatLng> directionPositionList = route.getLegList().get(0).getDirectionPoint();
+                    Distance = String.valueOf(direction.getRouteList().get(routecount).getLegList().get(0).getDistance().getText());
+                    time = String.valueOf(direction.getRouteList().get(routecount).getLegList().get(0).getDuration().getText());
+                    Start_Location = String.valueOf(direction.getRouteList().get(0).getLegList().get(0).getStartAddress());
+                    End_location = String.valueOf(direction.getRouteList().get(0).getLegList().get(0).getEndAddress());
+                    location_picker.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(color)));
+                    googleMap.addPolyline(DirectionConverter.createPolyline(this, directionPositionList, 5, getResources().getColor(color)));
+                    Toast.makeText(getApplicationContext(), "Alternative Route " + routecount, Toast.LENGTH_SHORT).show();
 
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "No Alternative Route available" + routecount, Toast.LENGTH_SHORT).show();
+                    routecount = 0;
+                }
+                routecount++;
             }
             txt_time.setText("Time travelled : " + time);
             txt_distance.setText("Distance : " + Distance);
             txt_travel_time.setText("Pick up location : " +
                     Start_Location + "\nDrop location : " + End_location);
-            routecount++;
+
             getCurrentLocation();
             googleMap.addMarker(new MarkerOptions().position(origin).title("Moving from").snippet(Start_Location));
             googleMap.addMarker(new MarkerOptions().position(destination).title("Moving to").snippet(End_location));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(origin));
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(10));
             dialog.dismiss();
         }
     }
@@ -339,6 +382,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onDirectionFailure(Throwable t) {
 
-Toast.makeText(getApplicationContext(),t.getMessage(),Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+        dialog.dismiss();
+    }
+    public float getprice(float dist_meter, float price_km) {
+
+        float TotalPrice = (dist_meter / 1000) * price_km;
+
+        return TotalPrice;
     }
 }

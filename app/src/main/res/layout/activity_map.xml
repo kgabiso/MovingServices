@@ -45,7 +45,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Description"
+                    android:text="Direction details"
                     android:textColor="@color/colorPrimary"
                     android:id="@+id/map_descr"
                     android:layout_gravity="center"
@@ -88,7 +88,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:text="get \n directions"
+        android:text="get other \n directions"
         android:layout_gravity="center"
         android:gravity="center"
         android:textColor="@color/colorPrimary"

@@ -71,7 +71,18 @@
         android:id="@+id/last_name"
         android:layout_gravity="center_horizontal" />
 </LinearLayout>
-
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:hint="contact number"
+                android:padding="10dp"
+                android:background="@drawable/textview_background"
+                android:ems="10"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:id="@+id/last_contact"
+                android:layout_gravity="center_horizontal" />
 
         </LinearLayout>
     </ScrollView>

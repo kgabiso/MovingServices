@@ -46,7 +46,7 @@
                 android:background="@drawable/textview_background"
                 android:ems="10"
                 android:hint="Confirmation Passowrd"
-                android:inputType="textPersonName"
+                android:inputType="textPassword"
                 android:padding="10dp" />
 
         </LinearLayout>

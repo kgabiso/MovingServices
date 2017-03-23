@@ -52,7 +52,6 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import java.text.DateFormat;
 import java.util.Calendar;
 
 import dmax.dialog.SpotsDialog;
@@ -197,7 +196,7 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
     }
 
     private void startingPost() {
-        // progressBar.setVisibility(View.VISIBLE);
+
         dialog.show();
         final String mTitle = ed_title.getText().toString();
         final String mDesc = ed_Desc.getText().toString();
@@ -205,8 +204,8 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
         final String mEmail = ed_Email.getText().toString();
         final String mLoction = ed_location.getText().toString();
         final String mPrice = ed_price.getText().toString();
-        final String mDate = DateFormat.getDateInstance(DateFormat.SHORT).format(Calendar.getInstance().getTime());
-        Toast.makeText(getApplicationContext(), mDate, Toast.LENGTH_SHORT).show();
+        final String mDate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+
         if (vehicle_type.getSelectedItemPosition() != 0) {
             mVehicle_type = vehicle_type.getSelectedItem().toString();
         } else {
@@ -231,7 +230,7 @@ public class AddPostActivity extends AppCompatActivity implements OnItemSelected
                     mDatabaseUser.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            // progressBar.setVisibility(View.VISIBLE);
+
                             newPost.child("title").setValue(mTitle);
                             newPost.child("description").setValue(mDesc);
                             newPost.child("contactNumber").setValue(mContactNumber);

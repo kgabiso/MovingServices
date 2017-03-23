@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:app="http://schemas.android.com/tools"
-    card_view:cardUseCompatPadding="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    card_view:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,159 +26,160 @@
             android:id="@+id/txtTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Title go here"
-            android:padding="5dp"
-            android:textColor="@color/primaryText"
             android:fontFamily="serif"
-            android:textStyle="normal"
-            android:textSize="15sp" />
+            android:padding="5dp"
+            android:text="Title go here"
+            android:textColor="@color/primaryText"
+            android:textSize="15sp"
+            android:textStyle="normal" />
 
         <LinearLayout
+            android:id="@+id/lin_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/lin_phone"
             android:clickable="true"
             android:orientation="horizontal">
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:paddingLeft="5dp"
-                android:src="@drawable/ic_call_black_24dp"/>
+                android:src="@drawable/ic_call_black_24dp" />
+
             <TextView
                 android:id="@+id/txtContactNumber"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Phone Number go here"
-                android:textColor="@color/secondaryText"
-                android:padding="5dp"
-                android:gravity="bottom"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-condensed"
+                android:gravity="bottom"
+                android:padding="5dp"
+                android:text="Phone Number go here"
+                android:textColor="@color/secondaryText"
                 android:textStyle="normal"
 
                 />
 
         </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/lin_email"
-        android:clickable="true"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingLeft="5dp"
-            android:src="@drawable/gmail_logo"/>
-        <TextView
-            android:id="@+id/txtContactEmail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Email Address go here"
-            android:padding="5dp"
-            android:gravity="bottom"
-            android:textColor="@color/secondaryText"
-            android:layout_weight="1"
-            android:fontFamily="sans-serif-condensed"
-            android:textStyle="normal"
 
-            />
-        </LinearLayout>
         <LinearLayout
+            android:id="@+id/lin_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/lin_location"
+            android:clickable="true"
             android:orientation="horizontal">
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:paddingLeft="5dp"
-                android:src="@drawable/google_maps"/>
+                android:src="@drawable/gmail_logo" />
+
+            <TextView
+                android:id="@+id/txtContactEmail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="bottom"
+                android:padding="5dp"
+                android:text="Email Address go here"
+                android:textColor="@color/secondaryText"
+                android:textStyle="normal"
+
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lin_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingLeft="5dp"
+                android:src="@drawable/google_maps" />
+
             <TextView
                 android:id="@+id/txtlocation"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="location go here"
-                android:padding="5dp"
-                android:textColor="@color/secondaryText"
+                android:layout_gravity="center"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-condensed"
-                android:textStyle="normal"
-                android:layout_gravity="center"
+                android:padding="5dp"
+                android:text="location go here"
+                android:textColor="@color/secondaryText"
                 android:textSize="15sp"
-               />
+                android:textStyle="normal" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp"
             android:orientation="horizontal"
+            android:padding="5dp"
             android:weightSum="1">
+
             <ImageButton
+                android:id="@+id/img_likes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/img_likes"
+                android:layout_gravity="center"
                 android:background="@drawable/round_imageview"
-                app:backgroundTint="@color/accept"
                 android:paddingLeft="5dp"
                 android:src="@drawable/ic_accept"
-                android:layout_gravity="center"
-                app:fabSize="mini"
+                app:backgroundTint="@color/accept"
                 app:elevation="0dp"
-                />
+                app:fabSize="mini" />
+
             <TextView
+                android:id="@+id/txtLikes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="(0)"
-                android:id="@+id/txtLikes"
+                android:layout_gravity="center"
                 android:fontFamily="sans-serif-condensed"
                 android:padding="5dp"
-                android:layout_gravity="center"
-                />
+                android:text="(0)" />
+
             <ImageButton
+                android:id="@+id/img_dislikes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/img_dislikes"
-                android:paddingLeft="5dp"
-                android:src="@drawable/ic_reject"
                 android:layout_gravity="center"
                 android:background="@drawable/round_dislike"
+                android:paddingLeft="5dp"
+                android:src="@drawable/ic_reject"
                 app:backgroundTint="@color/reject"
-                app:fabSize="mini"
                 app:elevation="0dp"
-                />
+                app:fabSize="mini" />
+
             <TextView
+                android:id="@+id/txtDislikes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
-                android:text="(0)"
-                android:fontFamily="sans-serif-condensed"
-                android:id="@+id/txtDislikes"
                 android:layout_gravity="center"
-                />
+                android:fontFamily="sans-serif-condensed"
+                android:paddingLeft="5dp"
+                android:text="(0)" />
 
             <TextView
                 android:id="@+id/txtDate"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:fontFamily="sans-serif-condensed"
-            android:gravity="bottom|right"
-            android:padding="5dp"
-            android:text="Date"
-            android:textSize="5dp"
-            android:textStyle="bold" />
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/img_send"
-                android:background="@null"
-                android:paddingLeft="5dp"
-                android:src="@drawable/ic_send_black_24dp"
-                android:layout_gravity="center"/>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="bottom|right"
+                android:padding="5dp"
+                android:text="Date"
+                android:textSize="7dp"
+                android:textStyle="bold" />
+
         </LinearLayout>
     </LinearLayout>
 

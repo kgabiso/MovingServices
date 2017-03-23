@@ -7,8 +7,22 @@
    android:paddingBottom="@dimen/activity_horizontal_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingTop="5dp"
     tools:context=".MessageActivity">
+    <TextView
+        android:id="@+id/mes_count"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:text="0"
+        android:textColor="@color/cardview_light_background"
+        android:background="@drawable/round_marker"
+        android:gravity="center_vertical|center"
+        android:textStyle="bold"
+        android:textSize="@dimen/activity_horizontal_margin"
+        android:elevation="5dp"
+        android:backgroundTint="@color/reject_text"
+
+        />
 <TextView
     android:id="@+id/mes_info"
     android:layout_width="match_parent"
@@ -23,6 +37,7 @@
         android:id="@+id/messageRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
 
        />
 

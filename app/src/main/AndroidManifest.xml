@@ -21,6 +21,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBgg6BjiNhdlkfSmFeqJxHDxKal-WcsxfY" />
+        <service
+            android:name=".BadgeIntentService"
+            android:exported="false"/>
         <!--
                    Defining Services
                -->
@@ -78,7 +81,7 @@
             android:theme="@style/NoToolBar" />
         <activity android:name=".MapActivity" android:label="Map" />
         <activity android:name=".MessageActivity" android:parentActivityName=".MainActivity" android:label="Requests"/>
-        <activity android:name=".Send_RequestActivity" android:parentActivityName=".SingleActivity" android:label="Send Request" />
+        <activity android:name=".Send_RequestActivity" android:label="Send Request" />
         <activity
             android:name=".reset_passwordActivity"
             android:parentActivityName=".LoginActivity" android:label="Reset Password"/>

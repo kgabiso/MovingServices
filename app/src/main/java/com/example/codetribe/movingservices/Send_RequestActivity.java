@@ -64,10 +64,10 @@ import java.util.Calendar;
 import de.hdodenhof.circleimageview.CircleImageView;
 import dmax.dialog.SpotsDialog;
 
-public class Send_RequestActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerDragListener, GoogleMap.OnMapLongClickListener ,DirectionCallback {
+public class Send_RequestActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerDragListener, GoogleMap.OnMapLongClickListener, DirectionCallback {
 
     private String serverKey = "AIzaSyCOuDlu_I4fGpPlulUrUHtC-9t-9zoy2pE";
-    private TextView txtLocation_to, txtLocation_from, txtDate,txtTime, txtDistance;
+    private TextView txtLocation_to, txtLocation_from, txtDate, txtTime, txtDistance;
     private GoogleMap mMap;
     private EditText edDesc;
     private Button btn_send;
@@ -78,14 +78,16 @@ public class Send_RequestActivity extends AppCompatActivity implements OnMapRead
     private double longitude;
     private double latitude;
     private LatLng latlng_from, latlng_to;
-    private DatabaseReference mDB_request,mDB_users;
+    private DatabaseReference mDB_request, mDB_users;
     private FirebaseAuth mAuth;
     private LovelyStandardDialog lovelyStandardDialog;
     private SpotsDialog dialog;
-    private String post_ID,uriProfile,owner_id;
+    private String post_ID, uriProfile, owner_id, price_km;
     private CircleImageView markerImageView;
-    private TextView txt_price,txt_travel_time;
+    private TextView txt_price, txt_travel_time;
     String origin, destination;
+    String mydate;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,23 +104,24 @@ public class Send_RequestActivity extends AppCompatActivity implements OnMapRead
         mDB_request.keepSynced(true);
         mAuth = FirebaseAuth.getInstance();
         dialog = new SpotsDialog(this);
-        txt_price = (TextView)findViewById(R.id.req_price);
-        txt_travel_time =(TextView)findViewById(R.id.req_travel_time);
+        txt_price = (TextView) findViewById(R.id.req_price);
+        txt_travel_time = (TextView) findViewById(R.id.req_travel_time);
         txtLocation_to = (TextView) findViewById(R.id.req_location_to);
         txtLocation_to.setClickable(true);
         txtLocation_to.setEnabled(false);
         txtLocation_from = (TextView) findViewById(R.id.req_location_from);
         txtLocation_from.setClickable(true);
         txtDate = (TextView) findViewById(R.id.req_date);
-        txtTime =(TextView)findViewById(R.id.req_time);
+        txtTime = (TextView) findViewById(R.id.req_time);
         txtDate.setClickable(true);
         txtDistance = (TextView) findViewById(R.id.req_distance);
         edDesc = (EditText) findViewById(R.id.req_desc);
         btn_send = (Button) findViewById(R.id.btn_request);
-
+        mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
         getProfile_Uri();
         post_ID = getIntent().getStringExtra("Post_key");
         owner_id = getIntent().getStringExtra("owerID");
+        price_km = getIntent().getStringExtra("price");
         lovelyStandardDialog = new LovelyStandardDialog(this);
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -163,7 +166,8 @@ public class Send_RequestActivity extends AppCompatActivity implements OnMapRead
 
 
     }
-    public void requestDirection(LatLng origin,LatLng destination) {
+
+    public void requestDirection(LatLng origin, LatLng destination) {
         dialog.show();
         dialog.setMessage("getting Map Directions");
 
@@ -174,19 +178,20 @@ public class Send_RequestActivity extends AppCompatActivity implements OnMapRead
                 .execute(this);
 
     }
-public void timePicker(){
 
-    final Calendar c = Calendar.getInstance();
-    mHour = c.get(Calendar.HOUR_OF_DAY);
-    mMinute = c.get(Calendar.MINUTE);
-    TimePickerDialog timePickerDialog = new TimePickerDialog(Send_RequestActivity.this, new TimePickerDialog.OnTimeSetListener() {
-        @Override
-        public void onTimeSet(TimePicker timePicker, int i, int i1) {
-            txtTime.setText(i+":"+i1);
-        }
-    },mHour,mMinute,false);
-    timePickerDialog.show();
-}
+    public void timePicker() {
+
+        final Calendar c = Calendar.getInstance();
+        mHour = c.get(Calendar.HOUR_OF_DAY);
+        mMinute = c.get(Calendar.MINUTE);
+        TimePickerDialog timePickerDialog = new TimePickerDialog(Send_RequestActivity.this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int i, int i1) {
+                txtTime.setText(i + ":" + i1);
+            }
+        }, mHour, mMinute, false);
+        timePickerDialog.show();
+    }
 
     public void datePicker() {
         //using calendar to show the current date
@@ -198,10 +203,13 @@ public void timePicker(){
         DatePickerDialog datePickerDialog = new DatePickerDialog(Send_RequestActivity.this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int i/*year*/, int i1/*month*/, int i2/*day*/) {
-                txtDate.setText(i2 + "-" + i1 + "-" + i);
+
+
+                    txtDate.setText(i2 + "-" + (i1+1) + "-" + i);
 
             }
         }, mYear, mMonth, mDay);
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
         datePickerDialog.show();
     }
 
@@ -298,7 +306,7 @@ public void timePicker(){
         //Creating a random coordinate
         LatLng latLng = new LatLng(-34, 151);
         //Adding marker to that coordinate
-       mMap.addMarker(new MarkerOptions().position(latLng).draggable(true).icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(uriProfile))));
+        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true).icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(uriProfile))));
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         //Setting onMarkerDragListener to track the marker drag
@@ -327,9 +335,9 @@ public void timePicker(){
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng_to));
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
 
-                if(!TextUtils.isEmpty(txtLocation_from.getText().toString().trim())) {
+                if (!TextUtils.isEmpty(txtLocation_from.getText().toString().trim())) {
 
-                    requestDirection(latlng_from,latlng_to);
+                    requestDirection(latlng_from, latlng_to);
                 }
             } else if (requestCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
@@ -358,9 +366,9 @@ public void timePicker(){
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
                 txtLocation_to.setEnabled(true);
 
-                if(!TextUtils.isEmpty(txtLocation_to.getText().toString().trim())) {
+                if (!TextUtils.isEmpty(txtLocation_to.getText().toString().trim())) {
 
-                    requestDirection(latlng_from,latlng_to);
+                    requestDirection(latlng_from, latlng_to);
                 }
             } else if (requestCode == PlaceAutocomplete.RESULT_ERROR) {
                 txtLocation_to.setEnabled(false);
@@ -378,29 +386,31 @@ public void timePicker(){
             }
         }
     }
-private void getProfile_Uri() {
 
-    String uid = mAuth.getCurrentUser().getUid();
-    if (mAuth.getCurrentUser().getUid() != null) {
-        mDB_users.child(uid).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                uriProfile = (String) dataSnapshot.child("profileimage").getValue();
-                Glide.with(getApplication()).load(uriProfile).centerCrop().into(markerImageView);
+    private void getProfile_Uri() {
 
-            }
+        String uid = mAuth.getCurrentUser().getUid();
+        if (mAuth.getCurrentUser().getUid() != null) {
+            mDB_users.child(uid).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    uriProfile = (String) dataSnapshot.child("profileimage").getValue();
+                    Glide.with(getApplication()).load(uriProfile).centerCrop().into(markerImageView);
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                }
 
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
     }
 
-}
     private void sendRequest() {
 
-        if(mAuth.getCurrentUser() != null) {
+        if (mAuth.getCurrentUser() != null) {
             dialog.show();
             final String uid = mAuth.getCurrentUser().getUid();
             final String location_to = txtLocation_to.getText().toString().trim();
@@ -408,11 +418,9 @@ private void getProfile_Uri() {
             final String date_move = txtDate.getText().toString().trim();
             final String request_desc = edDesc.getText().toString().trim();
             final String Time_move = txtTime.getText().toString().trim();
-            if (!TextUtils.isEmpty(location_from) )
-            {
-                if(!TextUtils.isEmpty(location_to))
-                {
-                    if(!TextUtils.isEmpty(date_move) && !TextUtils.isEmpty(Time_move)) {
+            if (!TextUtils.isEmpty(location_from)) {
+                if (!TextUtils.isEmpty(location_to)) {
+                    if (!TextUtils.isEmpty(date_move) && !TextUtils.isEmpty(Time_move)) {
                         mDB_request.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -426,10 +434,11 @@ private void getProfile_Uri() {
                                 mDB_request.child("latlng_to").setValue(latlng_to);
                                 mDB_request.child("desc_req").setValue(request_desc);
                                 mDB_request.child("post_id").setValue(post_ID);
-                                mDB_request.child("status").setValue("Accept");
+                                mDB_request.child("request_date").setValue(mydate);
+                                mDB_request.child("status").setValue("Pending");
                                 dialog.dismiss();
 
-                                Intent i = new Intent(Send_RequestActivity.this,MainActivity.class);
+                                Intent i = new Intent(Send_RequestActivity.this, MainActivity.class);
                                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(i);
                                 finish();
@@ -442,21 +451,20 @@ private void getProfile_Uri() {
                             }
                         });
 
-                    }else {
-                        Toast.makeText(getApplicationContext(),"You need to add date and of moving ",Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "You need to add date and of moving ", Toast.LENGTH_LONG).show();
                     }
-                }
-                else {
-                    Toast.makeText(getApplicationContext(),"You need add location were you going to ",Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "You need add location were you going to ", Toast.LENGTH_LONG).show();
                 }
 
-            }
-            else {
+            } else {
 
-                Toast.makeText(getApplicationContext(),"You need location were you going from ",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "You need location were you going from ", Toast.LENGTH_LONG).show();
             }
         }
     }
+
     private Bitmap getMarkerBitmapFromView(String resId) {
 
         View customMarkerView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custome_marker_layout, null);
@@ -545,14 +553,14 @@ private void getProfile_Uri() {
             mMap.addMarker(new MarkerOptions().position(latlng_to).title("I am moving to").snippet(destination));
 
             ArrayList<LatLng> directionPositionList = direction.getRouteList().get(0).getLegList().get(0).getDirectionPoint();
-            String Distance = String.valueOf(direction.getRouteList().get(0).getLegList().get(0).getDistance().getText());
+            String Distance = String.valueOf((direction.getRouteList().get(0).getLegList().get(0).getDistance().getText()));
             String time = String.valueOf(direction.getRouteList().get(0).getLegList().get(0).getDuration().getText());
-
+            float dist_meters = Float.parseFloat(direction.getRouteList().get(0).getLegList().get(0).getDistance().getValue());
             mMap.addPolyline(DirectionConverter.createPolyline(this, directionPositionList, 5, Color.BLUE));
 
-            txt_travel_time.setText("Time : "+time);
-            txt_price.setText("Price : ");
-            txtDistance.setText("Distance : "+Distance);
+            txt_travel_time.setText("Time : " + time);
+            txt_price.setText("Price : R" + getprice(dist_meters, Float.parseFloat(price_km)));
+            txtDistance.setText("Distance : " + Distance);
 
             dialog.dismiss();
         }
@@ -561,5 +569,12 @@ private void getProfile_Uri() {
     @Override
     public void onDirectionFailure(Throwable t) {
 
+    }
+
+    public float getprice(float dist_meter, float price_km) {
+
+        float TotalPrice = (dist_meter / 1000) * price_km;
+
+        return TotalPrice;
     }
 }
