@@ -290,20 +290,49 @@ public class MessageActivity extends AppCompatActivity implements OnMapReadyCall
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-//                                long_from = Double.parseDouble(dataSnapshot.child(post_key).child("latlng_from").child("latitude").getValue().toString());
-//                                lat_from = Double.parseDouble(dataSnapshot.child(post_key).child("latlng_from").child("longitude").getValue().toString());
-//
-//                                long_to = Double.parseDouble(dataSnapshot.child(post_key).child("latlng_to").child("latitude").getValue().toString());
-//                                lat_to = Double.parseDouble(dataSnapshot.child(post_key).child("latlng_to").child("longitude").getValue().toString());
-//
-//                                Intent i = new Intent(MessageActivity.this, MapActivity.class);
-//                                i.putExtra("latitude_from", lat_from);
-//                                i.putExtra("longitude_from", long_from);
-//                                i.putExtra("post_key", post_key);
-//                                i.putExtra("latitude_to", lat_to);
-//                                i.putExtra("longitude_to", long_to);
-//                                i.putExtra("Message",Message);
-//                                startActivity(i);
+                                long_from = Double.parseDouble(dataSnapshot.child(post_key).child("latlng_from").child("latitude").getValue().toString());
+                                lat_from = Double.parseDouble(dataSnapshot.child(post_key).child("latlng_from").child("longitude").getValue().toString());
+
+                                long_to = Double.parseDouble(dataSnapshot.child(post_key).child("latlng_to").child("latitude").getValue().toString());
+                                lat_to = Double.parseDouble(dataSnapshot.child(post_key).child("latlng_to").child("longitude").getValue().toString());
+
+                                Intent i = new Intent(MessageActivity.this, MapActivity.class);
+                                i.putExtra("latitude_from", lat_from);
+                                i.putExtra("longitude_from", long_from);
+                                i.putExtra("post_key", post_key);
+                                i.putExtra("latitude_to", lat_to);
+                                i.putExtra("longitude_to", long_to);
+                                startActivity(i);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                });
+                viewHolder.mes_maps.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mData_request.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                long_from = Double.parseDouble(dataSnapshot.child(post_key).child("latlng_from").child("latitude").getValue().toString());
+                                lat_from = Double.parseDouble(dataSnapshot.child(post_key).child("latlng_from").child("longitude").getValue().toString());
+
+                                long_to = Double.parseDouble(dataSnapshot.child(post_key).child("latlng_to").child("latitude").getValue().toString());
+                                lat_to = Double.parseDouble(dataSnapshot.child(post_key).child("latlng_to").child("longitude").getValue().toString());
+
+                                Intent i = new Intent(MessageActivity.this, MapActivity.class);
+                                i.putExtra("latitude_from", lat_from);
+                                i.putExtra("longitude_from", long_from);
+                                i.putExtra("post_key", post_key);
+                                i.putExtra("latitude_to", lat_to);
+                                i.putExtra("longitude_to", long_to);
+                                //i.putExtra("Message",Message);
+                                startActivity(i);
                             }
 
                             @Override
@@ -391,12 +420,12 @@ public class MessageActivity extends AppCompatActivity implements OnMapReadyCall
     public static class Request_ViewHolder extends RecyclerView.ViewHolder implements OnMapReadyCallback {
 
         private TextView mUserName, mLoc_to, mLoc_from, mDate, mStatus, mMessage, mess_status,mess_dateDiff,mess_contact,mess_email;
-        private ImageButton mAccept, mReject,mes_maps;
+        private ImageButton mAccept, mReject;
         private String uid, postID;
         private CircleImageView messengerImageView;
         private DatabaseReference mDataUser, mData_request;
         private CardView mes_card;
-        LinearLayout lin,lin_email,lin_phone,lin_status,lin_button;
+        LinearLayout lin,lin_email,lin_phone,lin_status,lin_button,mes_maps;
         private ImageView img_status;
         private View mV;
         boolean checkDate = true;
@@ -418,7 +447,7 @@ public class MessageActivity extends AppCompatActivity implements OnMapReadyCall
             lin = (LinearLayout) itemView.findViewById(R.id.lin_card);
             img_status = (ImageView) itemView.findViewById(R.id.img_status1);
             mess_dateDiff =(TextView)itemView.findViewById(R.id.mes_dateDif);
-            mes_maps =(ImageButton)itemView.findViewById(R.id.mes_maps);
+            mes_maps =(LinearLayout)itemView.findViewById(R.id.mes_maps);
             mess_contact =(TextView)itemView.findViewById(R.id.mes_contact);
             mess_email =(TextView)itemView.findViewById(R.id.mes_email);
             lin_email =(LinearLayout)itemView.findViewById(R.id.lin_mess_email);
@@ -455,7 +484,8 @@ public class MessageActivity extends AppCompatActivity implements OnMapReadyCall
                                 img_status.setColorFilter(context.getResources().getColor(R.color.accept));
                                 mes_card.setClickable(true);
                                 lin_button.setVisibility(View.GONE);
-                                lin_status.setVisibility(View.VISIBLE);
+                                mes_maps.setVisibility(View.VISIBLE);
+                                lin_status.setVisibility(View.GONE);
 
                             } else if (dataSnapshot.child(key).child("status").getValue().toString().equals("Pending"))
                             {
@@ -544,10 +574,11 @@ public class MessageActivity extends AppCompatActivity implements OnMapReadyCall
         public void getTimeDifference(Date endDate, Date startDate, final Context context, final String post_key) {
             long timeDiff = endDate.getTime() - startDate.getTime();
 
-           if (timeDiff/(24*60*60*1000) >= 1)
+           if (timeDiff/(24*60*60*1000) >= 0)
            {
-
                mess_dateDiff.setText("("+timeDiff/(24*60*60*1000)+" days left)");
+
+
            }else {
                mData_request.addListenerForSingleValueEvent(new ValueEventListener() {
                    @Override
@@ -625,10 +656,10 @@ public class MessageActivity extends AppCompatActivity implements OnMapReadyCall
 
         public void setStatus(String status) {
             if (TextUtils.isEmpty(status)) {
-                mStatus.setText("Status :Pending");
+                mStatus.setText("Pending");
                 mess_status.setText("Pending");
             } else {
-                mStatus.setText("Status :" + status);
+                mStatus.setText(status);
                 mess_status.setText(status);
             }
 

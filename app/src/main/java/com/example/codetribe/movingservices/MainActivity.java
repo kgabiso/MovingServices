@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
             }
         });
         countRequest();
-        startInternService();
+        stopInternService();
     }
 
     protected void sendEmail(String To) {
@@ -285,7 +285,11 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
                             //Log.d(TAG, badgesNotSupportedException.getMessage());
                         }
                     } else {
-
+                        try {
+                            Badges.setBadge(getApplicationContext(), 0);
+                        } catch (BadgesNotSupportedException badgesNotSupportedException) {
+                            //Log.d(TAG, badgesNotSupportedException.getMessage());
+                        }
                         request_count.setVisibility(View.GONE);
                     }
 
@@ -297,6 +301,10 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
                 }
             });
         }
+    }
+    public void stopInternService(){
+        Intent i = new Intent(getApplicationContext(),BadgeIntentService.class);
+        stopService(i);
     }
 public void startInternService(){
     Intent i = new Intent(getApplicationContext(),BadgeIntentService.class);
@@ -445,6 +453,7 @@ public void startInternService(){
             anim.start();
         }else {
             super.onBackPressed();
+            startInternService();
         }
     }
 

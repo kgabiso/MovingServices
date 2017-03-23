@@ -80,8 +80,12 @@ public class BadgeIntentService extends IntentService {
                             //Log.d(TAG, badgesNotSupportedException.getMessage());
                         }
                     } else {
-
-
+                        count = 0;
+                        try {
+                            Badges.setBadge(getApplicationContext(), count);
+                        } catch (BadgesNotSupportedException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                 }
