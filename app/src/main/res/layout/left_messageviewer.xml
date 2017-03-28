@@ -33,12 +33,14 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
             android:text="@string/accept" />
+
         <TextView
             android:id="@+id/mes_dateDif"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
             android:text="(days left)" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -69,34 +71,39 @@
             app:cardBackgroundColor="@color/colorPrimary"
             app:cardCornerRadius="10dp"
             app:cardElevation="5dp">
+
             <LinearLayout
+                android:id="@+id/lin_status"
                 android:layout_width="500dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:orientation="vertical"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
-                android:id="@+id/lin_status"
                 android:rotation="30"
-                android:layout_gravity="center"
-                >
+                android:visibility="gone">
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
-                    android:background="@color/route"/>
+                    android:background="@color/route" />
+
                 <TextView
                     android:id="@+id/mes_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Status"
                     android:layout_gravity="center"
+                    android:text="Status"
                     android:textColor="@color/route"
-                    android:textStyle="bold"
-                    android:textSize="20dp"/>
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
-                    android:background="@color/route"/>
+                    android:background="@color/route" />
 
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -150,11 +157,13 @@
                     android:text="location_to"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/editText" />
+
                 <LinearLayout
+                    android:id="@+id/lin_mess_contact"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:id="@+id/lin_mess_contact">
+                    android:orientation="horizontal">
+
                     <TextView
                         android:id="@+id/mes_contact"
                         android:layout_width="wrap_content"
@@ -165,18 +174,20 @@
                         android:text="location_to"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/editText" />
+
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_call_white_24dp"
                         android:layout_gravity="right"
-                        />
+                        android:src="@drawable/ic_call_white_24dp" />
                 </LinearLayout>
+
                 <LinearLayout
+                    android:id="@+id/lin_mess_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:id="@+id/lin_mess_email">
+                    android:orientation="horizontal">
+
                     <TextView
                         android:id="@+id/mes_email"
                         android:layout_width="wrap_content"
@@ -187,13 +198,13 @@
                         android:text="location_to"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/editText" />
+
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/gmail_logo"
-                        android:tint="@color/editText"
                         android:layout_gravity="right"
-                        />
+                        android:src="@drawable/gmail_logo"
+                        android:tint="@color/editText" />
                 </LinearLayout>
 
 
@@ -216,26 +227,26 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/editText" />
 
-                  <!--  <TextView
-                        android:id="@+id/mes_status"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:paddingBottom="5dp"
-                        android:paddingRight="5dp"
-                        android:text="panding"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="@color/editText" />-->
+                    <!--  <TextView
+                          android:id="@+id/mes_status"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="1"
+                          android:gravity="center_horizontal"
+                          android:paddingBottom="5dp"
+                          android:paddingRight="5dp"
+                          android:text="panding"
+                          android:textAppearance="?android:attr/textAppearanceSmall"
+                          android:textColor="@color/editText" />-->
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/lin_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:gravity="center"
-                    android:orientation="horizontal"
-                    android:id="@+id/lin_button">
+                    android:orientation="horizontal">
 
                     <ImageButton
                         android:id="@+id/mes_accept"
@@ -273,16 +284,55 @@
                         android:text="Reject"
                         android:textColor="@color/reject" />
 
-                    <ImageButton
-                        android:id="@+id/mes_maps"
-                        android:layout_width="35dp"
-                        android:layout_height="35dp"
-                        android:background="@drawable/round_dislike"
-                        android:scaleType="fitStart"
-                        android:src="@drawable/route"
-                        android:visibility="gone" />
+                    />
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/mes_maps"
+                    android:layout_width="500dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:paddingBottom="@dimen/activity_horizontal_margin"
+                    android:visibility="gone">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:background="@color/accept" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Accepted"
+                            android:textColor="@color/accept"
+                            android:textSize="20dp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:paddingLeft="@dimen/activity_horizontal_margin"
+                            android:scaleType="fitStart"
+                            android:src="@drawable/google_maps_white" />
+                    </LinearLayout>
+
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:background="@color/accept" />
+
+                </LinearLayout>
             </LinearLayout>
 
         </android.support.v7.widget.CardView>
