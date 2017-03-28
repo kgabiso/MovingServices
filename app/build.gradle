@@ -43,6 +43,8 @@ dependencies {
     compile ('com.github.ozodrukh:CircularReveal:1.1.1@aar') {
         transitive = true;
     }
+
+    compile 'com.github.arturogutierrez:badges:1.0.5@aar'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
     compile 'de.hdodenhof:circleimageview:2.1.0'
